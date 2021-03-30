@@ -1,0 +1,126 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Hello World",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://helloworld.service.hmrc.gov.uk/"
+    }
+  ],
+  "consumes": [
+    "application/hal+json"
+  ],
+  "produces": [
+    "application/hal+json"
+  ],
+  "schemes": [
+    "HTTPS"
+  ],
+  "externalDocs": {
+    "description": "This is an example API that allows software developers to test that \ntheir applications can connect with the HMRC API Platform. It also acts \nas a hands-on tutorial for developers to get started with HMRC APIs.\n\nIt includes resources for testing access to the three different access \nlevels:\n\n- _Say hello world_ is an example of an unrestricted endpoint\n- _Say hello user_ is an example of a user-restricted endpoint\n- _Say hello application_ is an example of an application-restricted endpoint\n\nFurther details of the different access levels are given on the \n[Authorisation](/api-documentation/docs/authorisation) page.\n\nFor more information about how to develop your own client applications, including example clients for this API, \nsee [Tutorials](/api-documentation/docs/tutorials).",
+    "x-amf-title": "Overview"
+  },
+  "x-amf-userDocumentation": [
+    {
+      "content": "When an API changes in a way that is backwards-incompatible, we increase the version number of the API. \nSee our [reference guide](/api-documentation/docs/reference-guide#versioning) for more on\nversioning.\n",
+      "title": "Versioning"
+    },
+    {
+      "content": "We use standard HTTP status codes to show whether an API request succeeded or not. They are usually in the range:\n* 200 to 299 if it succeeded, including code 202 if it was accepted by an API that needs to wait for further action\n* 400 to 499 if it failed because of a client error by your application\n* 500 to 599 if it failed because of an error on our server\n\nErrors specific to each API are shown in the Endpoints section, under Response. \nSee our [reference guide](/api-documentation/docs/reference-guide#errors) for more on errors.\n\n",
+      "title": "Errors"
+    }
+  ],
+  "paths": {
+    "/hello": {},
+    "/hello/world": {
+      "get": {
+        "operationId": "Say hello world",
+        "description": "A simple example for integrating with an unrestricted service.\n\nAny request to this endpoint initiates a 'Hello World' response.\n",
+        "x-amf-is": [
+          "headers.acceptHeader"
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Hello World"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hello/user": {
+      "get": {
+        "operationId": "Say hello user",
+        "description": "A simple example for integrating with a user-restricted service, using an OAuth 2.0 `access_token`.\n\nAny authorised request to this endpoint initiates a 'Hello User' response.\n",
+        "x-amf-is": [
+          "headers.acceptHeader"
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Hello User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "sec.oauth_2_0": [
+              "null"
+            ]
+          }
+        ],
+        "x-annotations.scope": "hello"
+      }
+    },
+    "/hello/application": {
+      "get": {
+        "operationId": "Say hello application",
+        "description": "A simple example for integrating with an application-restricted service, using an OAuth 2.0 `access_token`.\n\nAny authorised request to this endpoint initiates a 'Hello Application' response.\n",
+        "x-amf-is": [
+          "headers.acceptHeader"
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Hello Application"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "sec.x-application": []
+          }
+        ]
+      }
+    }
+  },
+  "x-amf-uses": {
+    "sec": "https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml",
+    "headers": "https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml",
+    "annotations": "https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml",
+    "types": "https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml"
+  }
+}
