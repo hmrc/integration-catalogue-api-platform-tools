@@ -42,7 +42,7 @@ function toCsv(list){
 				addHeader(key);
 			}			
 		}
-		return header.join();
+		return header.join(";");
 	};
 	
 	var getRow = function(item){
@@ -59,7 +59,7 @@ function toCsv(list){
 				values.push(item[key]);
 			}			
 		}
-		return values.join();
+		return values.join(";");
 	};
 	
 	var headerPrinted = false;	
@@ -75,7 +75,7 @@ function toCsv(list){
 	return lines.join('\n');
 }
 
-db = db.getSiblingDB("api-definition")
+//db = db.getSiblingDB("api-definition-external-test")
 
 var c = db.api.aggregate([{
     $unwind: "$versions"
@@ -88,19 +88,32 @@ var c = db.api.aggregate([{
            $ne :  "PRIVATE"
         }
     }
-}
-,{
+},{
      $project: {
          _id: 0,
          serviceName : "$serviceName",
+         name: "$name",
+         description: "$description",
          version : "$versions.version"
      }
- },{
-	 $sort: {
-		 serviceName: 1,
-		 version: 1
-	 }
- }
+},{
+    $group: {
+        _id: {
+            "serviceName" : "$serviceName",
+            "name" : "$name",
+            "description": "$description",
+        },
+        versions: {
+            $max : "$version"
+        }
+    }
+}
+
+,{
+ 	 $sort: {
+ 		 "_id.serviceName": 1,
+ 	 }
+  }
 ])
 
 // c

@@ -7,13 +7,17 @@ import webapi.WebApiBaseUnit
 import javax.xml.transform.Source
 import java.io.BufferedWriter
 import java.io.FileWriter
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import java.util.concurrent.TimeUnit
+
 
 object ApiPlatformOasExport {
   def export() = {
 
     ListOfApis.apis.
       foreach(api => {
-        java.util.concurrent.TimeUnit.SECONDS.sleep(5); // To prevent akamai from blocking requests due to DDos protected. TBC.
+        java.util.concurrent.TimeUnit.SECONDS.sleep(1); // To prevent akamai from blocking requests due to DDos protected. TBC.
         createApiPlatformOas(api)
       })
 
@@ -31,7 +35,11 @@ object ApiPlatformOasExport {
       val model : WebApiBaseUnit = Raml10.parse(url).get()
 
       val outputFilepath = s"file://generated/${api.serviceName}-${api.version}.yaml"
-      Oas30.generateYamlFile(model, outputFilepath)
+      println(s"Starting API: ${api.serviceName}, ${api.version} Url:\n${url}")
+
+      val f = Oas30.generateYamlFile(model, outputFilepath)
+      f.get(60, TimeUnit.SECONDS)
+            
       // Oas30.generateFile(model, outputFilepath)
 
       println("Generated Oas30 YAML file at: " + outputFilepath);      
