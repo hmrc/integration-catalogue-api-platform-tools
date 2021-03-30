@@ -95,8 +95,13 @@ var c = db.api.aggregate([{
          serviceName : "$serviceName",
          version : "$versions.version"
      }
+ },{
+	 $sort: {
+		 serviceName: 1,
+		 version: 1
+	 }
  }
 ])
 
-c
+// c
 print(toCsv(c))

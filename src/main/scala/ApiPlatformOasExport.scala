@@ -18,7 +18,11 @@ object ApiPlatformOasExport {
   }
 
   def createApiPlatformOas(api: Api){
-    val url = s"https://developer.qa.tax.service.gov.uk/api-documentation/docs/api/download/${api.serviceName}/${api.version}/application.raml";
+    // QA
+    //val url = s"https://developer.qa.tax.service.gov.uk/api-documentation/docs/api/download/${api.serviceName}/${api.version}/application.raml";
+
+    // Prod
+    val url = s"https://developer.service.hmrc.gov.uk/api-documentation/docs/api/download/${api.serviceName}/${api.version}/application.raml";
 
     try{
       val model : WebApiBaseUnit = Raml10.parse(url).get()

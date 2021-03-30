@@ -2,8 +2,8 @@
 
 yes | rm -rf generated/*
 
-sbt run
-
 yes | rm -rf $WORKSPACE/integration-catalogue-frontend/app/assets/apiplatformspecs/* 
+
+sbt run
 
 cp generated/* $WORKSPACE/integration-catalogue-frontend/app/assets/apiplatformspecs 
