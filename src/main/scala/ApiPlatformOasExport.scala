@@ -1,7 +1,3 @@
-import org.scalatest.wordspec.AnyWordSpec
-
-// package co.acme.translate;
-
 import webapi.Raml10;
 import webapi.Oas30;
 import webapi.WebApiModule;
@@ -14,18 +10,18 @@ import javax.xml.transform.Source
 import java.io.BufferedWriter
 import java.io.FileWriter
 
-
-class RamlSpec extends AnyWordSpec {
-  "Extract API from QA API Platform" in {
+object ApiPlatformOasExport {
+  def export() = {
     val rows = apis
       .split("\n")
       .map(row => {
-        val rowItems = row.split(",")
+        val rowItems = row.split(",") 
         (java.net.URLEncoder.encode(rowItems(0)), rowItems(1))
       })
 
-    rows
-      .foreach( row => createApiPlatformOas(row._1, row._2))
+    rows.foreach( row => createApiPlatformOas(row._1, row._2))
+
+    println("Done!")
   }
 
   val apis1 = """trust-registration-api,1.0"""
@@ -83,7 +79,7 @@ api-open-access-test-service,1.0"""
       val model : WebApiBaseUnit = Raml10.parse(url).get()
 
       val outputFilepath = s"file://generated/qa/$serviceName-$version.yaml"
-       Oas30.generateYamlFile(model, outputFilepath)
+      Oas30.generateYamlFile(model, outputFilepath)
       // Oas30.generateFile(model, outputFilepath)
 
       println("Generated Oas30 YAML file at: " + outputFilepath);      
