@@ -97,5 +97,6 @@ var c = db.api.aggregate([{
      }
  }
 ])
+
 c
-//print(toCsv(c))
+print(toCsv(c))
