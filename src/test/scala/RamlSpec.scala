@@ -12,53 +12,51 @@ import java.util.concurrent.ExecutionException;
 
 
 class RamlSpec extends AnyWordSpec {
-  // def scratch {
-  //   println("Hello!")
+  // "scratch 1" in {
+  //   val inp ="#%RAML 1.0\n" +
+  //               "types:\n" +
+  //               "  Book:\n" +
+  //               "    type: object\n" +
+  //               "    properties:\n" +
+  //               "      title: string\n" +
+  //               "      author: string\n";
+
+  //     val x = Raml10.parse(inp).get()
+  //     val fpath = "file://generated.json"
+  //     Oas30.generateFile(x, fpath)
+  //     System.out.println("Generating Oas30 YAML file at: " + fpath);
+
+  //     // val doc : WebApiModule = Raml10.parse(inp).get().asInstanceOf[WebApiModule];
   // }
 
-  "scratch 1" in {
-    val inp ="#%RAML 1.0\n" +
-                "types:\n" +
-                "  Book:\n" +
-                "    type: object\n" +
-                "    properties:\n" +
-                "      title: string\n" +
-                "      author: string\n";
+  // "scratch 2" in {
+  //   val inp ="http://localhost:9601/api/conf/1.0/application.raml";
 
-      val x = Raml10.parse(inp).get()
-      val fpath = "file://generated.json"
-      Oas30.generateFile(x, fpath)
-      System.out.println("Generating Oas30 YAML file at: " + fpath);
+  //     val x = Raml10.parse(inp).get()
+  //     val fpath = "file://generated/hello.json"
+  //     Oas30.generateFile(x, fpath)
+  //     System.out.println("Generating Oas30 YAML file at: " + fpath);
 
-      // val doc : WebApiModule = Raml10.parse(inp).get().asInstanceOf[WebApiModule];
-  }
+  //     // val doc : WebApiModule = Raml10.parse(inp).get().asInstanceOf[WebApiModule];
+  // }
 
-    "scratch 2" in {
-    val inp ="http://localhost:9601/api/conf/1.0/application.raml";
+  // "Scratch 3" in {
+  //   val inp ="https://developer.qa.tax.service.gov.uk/api-documentation/docs/api/download/api-example-microservice/1.0/application.raml";
 
-      val x = Raml10.parse(inp).get()
-      val fpath = "file://generated/hello.json"
-      Oas30.generateFile(x, fpath)
-      System.out.println("Generating Oas30 YAML file at: " + fpath);
-
-      // val doc : WebApiModule = Raml10.parse(inp).get().asInstanceOf[WebApiModule];
-  }
-
-  "Scratch 3" in {
-    val inp ="https://developer.qa.tax.service.gov.uk/api-documentation/docs/api/download/api-example-microservice/1.0/application.raml";
-
-    val x = Raml10.parse(inp).get()
-    val fpath = "file://generated/hello.json"
-    Oas30.generateFile(x, fpath)
-    System.out.println("Generating Oas30 YAML file at: " + fpath);
-    // val doc : WebApiModule = Raml10.parse(inp).get().asInstanceOf[WebApiModule];
-  }
+  //   val x = Raml10.parse(inp).get()
+  //   val fpath = "file://generated/hello.json"
+  //   Oas30.generateFile(x, fpath)
+  //   System.out.println("Generating Oas30 YAML file at: " + fpath);
+  //   // val doc : WebApiModule = Raml10.parse(inp).get().asInstanceOf[WebApiModule];
+  // }
 
   "Extract API from QA API Platform" in {
-    val rows = apis.split("\n").map(row => {
-      val x = row.split(",")
-      (java.net.URLEncoder.encode(x(0)), x(1))
-    })
+    val rows = apis
+      .split("\n")
+      .map(row => {
+        val x = row.split(",")
+        (java.net.URLEncoder.encode(x(0)), x(1))
+      })
 
     rows.foreach( row => createApiPlatformOas(row._1, row._2))
   }
