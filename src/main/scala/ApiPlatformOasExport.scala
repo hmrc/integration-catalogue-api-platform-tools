@@ -12,7 +12,10 @@ object ApiPlatformOasExport {
   def export() = {
 
     ListOfApis.apis.
-      foreach(createApiPlatformOas)
+      foreach(api => {
+        java.util.concurrent.TimeUnit.SECONDS.sleep(5); // To prevent akamai from blocking requests due to DDos protected. TBC.
+        createApiPlatformOas(api)
+      })
 
     println("Done!")
   }
