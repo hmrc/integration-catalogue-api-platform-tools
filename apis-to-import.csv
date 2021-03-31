@@ -1,0 +1,100 @@
+_id.serviceName;_id.name;versions;type.0
+agent-authorisation-api;Agent Authorisation;1.0;PUBLIC
+agent-authorisation-test-support-api;Agent Authorisation Test Support;1.0;PUBLIC
+api-example-microservice;Hello World;1.0;PUBLIC
+api-notification-pull;Pull Notifications;1.0;PUBLIC;public/api/conf
+api-platform-test-user;Create Test User;1.0;PUBLIC
+apprenticeship-levy;Apprenticeship Levy;1.0;PRIVATE;public/api/conf
+breathing-space-if-dynamic-stub;Breathing Space Test Support;1.0;PRIVATE;public/api/conf
+breathing-space-if-proxy;Breathing Space;1.0;PRIVATE;public/api/conf
+business-details-api;Business Details (MTD);1.0;PUBLIC
+business-rates-api;Business Rates;2.0;PRIVATE
+business-rates-test-support-api;Business Rates Test Support;1.0;PRIVATE
+check-eori-number-api;Check an EORI Number;1.0;PUBLIC;public/api/conf
+cis-deductions-api;CIS Deductions (MTD);1.0;PUBLIC
+common-transit-convention-traders;Common Transit Convention Traders;1.0;PUBLIC
+compliance-cases-api;Compliance Cases;1.0;PRIVATE;public/api/conf
+compliance-documents-api;Compliance Documents;1.0;PRIVATE;public/api/conf
+customer-profile;Customer Profile;1.0;PRIVATE
+customs-declarations;Customs Declarations;3.0;PRIVATE;public/api/conf
+customs-declarations-information;Customs Declarations Information;2.0;PRIVATE;public/api/conf
+customs-financials-api;CDS Financials Notifications;1.0;PRIVATE
+customs-inventory-linking-exports;Customs Inventory Linking Exports;2.0;BOTH;public/api/conf
+customs-inventory-linking-imports;Customs Inventory Linking Imports;2.0;PRIVATE;public/api/conf
+enrolment-store-proxy;Enrolment Management and Agent Client Relationship;1.0;PRIVATE;public/api/documentation
+epaye-api;PAYE for employers;1.0;PRIVATE
+get-nino-api;Register NINO;1.0;PRIVATE;public/api/conf
+goods-movement-system-carrier-api;Goods Vehicle Movements Carrier;1.0;PRIVATE
+goods-movement-system-haulier-api;Goods Vehicle Movements;1.0;PUBLIC
+goods-movement-system-port-api;Goods Vehicle Movements Port;1.0;PRIVATE
+help-to-save-api;Help To Save;2.0;PRIVATE
+identity-verification;Identity Verification;1.0;PRIVATE
+individual-benefits;Individual Benefits;1.1;PUBLIC
+individual-calculations-api;Individual Calculations (MTD);2.0;PUBLIC
+individual-employment;Individual Employment;1.2;PUBLIC
+individual-income;Individual Income;1.2;PUBLIC
+individual-income-des-stub;Individuals Income Test Support;1.0;PRIVATE
+individual-losses-api;Individual Losses (MTD);2.0;PUBLIC
+individual-tax;Individual Tax;1.1;PUBLIC
+individuals-benefits-and-credits-api;Individuals Benefits and Credits;1.0;PRIVATE
+individuals-business-eops-api;Individuals Business End of Period Statement (MTD);1.0;PUBLIC
+individuals-charges-api;Individuals Charges (MTD);1.0;PUBLIC
+individuals-details-api;Individuals Details;1.0;PRIVATE
+individuals-disclosures-api;Individuals Disclosures (MTD);1.0;PUBLIC
+individuals-employments-api;Individuals Employments;P1.0;PRIVATE
+individuals-expenses-api;Individuals Expenses (MTD);1.0;PUBLIC
+individuals-if-api-stub;Individuals Integration Framework Test Support;1.0;PRIVATE
+individuals-income-api;Individuals Income;P1.0;PRIVATE
+individuals-income-received-api;Individuals Income Received (MTD);1.0;PUBLIC
+individuals-matching-api;Individuals Matching;P1.0;PRIVATE
+individuals-reliefs-api;Individuals Reliefs (MTD);1.0;PUBLIC
+individuals-state-benefits-api;Individuals State Benefits (MTD);1.0;PUBLIC
+interest-restriction-return;Interest Restriction Return (IRR);1.0;PUBLIC;public/api/conf
+iv-orchestration;IV Orchestration;1.0;PRIVATE
+lisa-api;Lifetime ISA;2.0;PUBLIC
+marriage-allowance;Marriage Allowance;2.0;PUBLIC
+marriage-allowance-des-stub;Marriage Allowance Test Support;1.0;PUBLIC
+mobile-audit;Mobile Audit;1.0;PRIVATE
+mobile-help-to-save;Mobile Help To Save;1.0;PRIVATE
+mobile-messages;Mobile Messages;1.0;PRIVATE
+mobile-office-of-transit;Mobile Office of Transit;1.0;PRIVATE
+mobile-paye;Mobile PAYE;1.0;PRIVATE
+mobile-push-notifications-registration;Mobile Push Notifications Registration;1.0;PRIVATE
+mobile-rds-vehicle-private;Mobile RDS Vehicle Private;1.0;PRIVATE
+mobile-rds-vehicle-public;Mobile RDS Vehicle Public;1.0;PRIVATE
+mobile-startup;Mobile Startup;1.0;PRIVATE
+mobile-tax-credits-renewal;Mobile Tax Credits Renewal;1.0;PRIVATE
+mobile-tax-credits-summary;Mobile Tax Credits Summary;1.0;PRIVATE
+mobile-user-contact;Mobile User Contact;1.0;PRIVATE
+national-insurance;National Insurance;1.1;PUBLIC
+national-insurance-des-stub;National Insurance Test Support;1.0;PUBLIC
+national-insurance-record;National Insurance Record;1.0;PRIVATE;public/api/conf
+oauth;OAuth;1.0;PRIVATE
+obligations-api;Obligations (MTD);1.0;PUBLIC
+openid-connect-userinfo;User Information;1.1;PRIVATE;public/api/conf
+other-deductions-api;Other Deductions (MTD);1.0;PUBLIC
+paye-des-stub;Individual PAYE Test Support;1.0;PUBLIC
+payments-bin-check;Payments Bin Check;1.0;PRIVATE;public/api/conf
+payments-processor;Charge Ref Notification;1.0;PRIVATE
+property-business-api;Property Business (MTD);1.0;PUBLIC
+push-pull-notifications-api;Push Pull Notifications;1.0;PUBLIC
+ras-api;Relief At Source;2.0;PUBLIC
+real-time-income-information;Real Time Income Information;1.0;PRIVATE;public/api/conf
+secure-data-exchange-bulk-download;Bulk Data File List;1.0;PUBLIC;public/api/conf
+secure-data-exchange-notifications;Secure Data Exchange Notifications;1.0;PRIVATE
+self-assessment-accounts-api;Self Assessment Accounts (MTD);1.0;PUBLIC
+self-assessment-api;Self Assessment (MTD);2.0;PUBLIC;public/api/conf
+self-assessment-biss-api;Business Income Source Summary (MTD);1.0;PUBLIC
+self-assessment-bsas-api;Business Source Adjustable Summary (MTD);2.0;PUBLIC
+sso-session-api;Web Session API;1.0;PRIVATE;public/api/conf
+sso-session-link-api;Sso In API;1.0;PRIVATE;public/api/conf
+state-pension;State Pension;1.0;PRIVATE;public/api/conf
+state-pension-calculation;Get State Pension Calculation;1.0;PRIVATE;public/api/conf
+submission-tracker;Submission Tracker;1.0;PRIVATE
+telephony-identity-verification-api;Telephony Identity Verification;1.0;PRIVATE
+transit-movement-api;Transit Movement;1.0;PRIVATE
+txm-fph-validator-api;Test Fraud Prevention Headers;1.0;PUBLIC
+userid-recovery-api;User ID Recovery;1.0;PRIVATE;public/api/documentation
+vat-api;VAT (MTD);1.0;PUBLIC;public/api/conf
+vat-registered-companies-api;Check a UK VAT number;1.0;PUBLIC;public/api/conf
+voice-biometrics;Voice Biometrics;1.1;PRIVATE;/public/api/conf
