@@ -85,7 +85,6 @@ real-time-income-information;Real Time Income Information;1.0;PRIVATE;public/api
 secure-data-exchange-bulk-download;Bulk Data File List;1.0;PUBLIC;public/api/conf
 secure-data-exchange-notifications;Secure Data Exchange Notifications;1.0;PRIVATE
 self-assessment-accounts-api;Self Assessment Accounts (MTD);1.0;PUBLIC
-self-assessment-api;Self Assessment (MTD);2.0;PUBLIC;public/api/conf
 self-assessment-biss-api;Business Income Source Summary (MTD);1.0;PUBLIC
 self-assessment-bsas-api;Business Source Adjustable Summary (MTD);2.0;PUBLIC
 sso-session-api;Web Session API;1.0;PRIVATE;public/api/conf
@@ -98,6 +97,5 @@ telephony-identity-verification-test-api;Telephony Identity Verification Test;1.
 transit-movement-api;Transit Movement;1.0;PRIVATE
 txm-fph-validator-api;Test Fraud Prevention Headers;1.0;PUBLIC
 userid-recovery-api;User ID Recovery;1.0;PRIVATE;public/api/documentation
-vat-api;VAT (MTD);1.0;PUBLIC;public/api/conf
 vat-registered-companies-api;Check a UK VAT number;1.0;PUBLIC;public/api/conf
 voice-biometrics;Voice Biometrics;1.1;PRIVATE;public/api/conf
