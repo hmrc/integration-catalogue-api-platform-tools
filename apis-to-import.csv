@@ -1,10 +1,12 @@
 _id.serviceName;_id.name;versions;type.0
+address-lookup;Address Verification;1.0;PRIVATE;public/api/conf
 agent-authorisation-api;Agent Authorisation;1.0;PUBLIC
 agent-authorisation-test-support-api;Agent Authorisation Test Support;1.0;PUBLIC
 api-example-microservice;Hello World;1.0;PUBLIC
 api-notification-pull;Pull Notifications;1.0;PUBLIC;public/api/conf
 api-platform-test-user;Create Test User;1.0;PUBLIC
 apprenticeship-levy;Apprenticeship Levy;1.0;PRIVATE;public/api/conf
+bank-account-reputation;Bank Account Verification;1.0;PRIVATE;public/api/conf
 breathing-space-if-dynamic-stub;Breathing Space Test Support;1.0;PRIVATE;public/api/conf
 breathing-space-if-proxy;Breathing Space;1.0;PRIVATE;public/api/conf
 business-details-api;Business Details (MTD);1.0;PUBLIC
@@ -83,6 +85,7 @@ real-time-income-information;Real Time Income Information;1.0;PRIVATE;public/api
 secure-data-exchange-bulk-download;Bulk Data File List;1.0;PUBLIC;public/api/conf
 secure-data-exchange-notifications;Secure Data Exchange Notifications;1.0;PRIVATE
 self-assessment-accounts-api;Self Assessment Accounts (MTD);1.0;PUBLIC
+self-assessment-api;Self Assessment (MTD);2.0;PUBLIC;public/api/conf
 self-assessment-biss-api;Business Income Source Summary (MTD);1.0;PUBLIC
 self-assessment-bsas-api;Business Source Adjustable Summary (MTD);2.0;PUBLIC
 sso-session-api;Web Session API;1.0;PRIVATE;public/api/conf
@@ -91,8 +94,10 @@ state-pension;State Pension;1.0;PRIVATE;public/api/conf
 state-pension-calculation;Get State Pension Calculation;1.0;PRIVATE;public/api/conf
 submission-tracker;Submission Tracker;1.0;PRIVATE
 telephony-identity-verification-api;Telephony Identity Verification;1.0;PRIVATE
+telephony-identity-verification-test-api;Telephony Identity Verification Test;1.0;PRIVATE
 transit-movement-api;Transit Movement;1.0;PRIVATE
 txm-fph-validator-api;Test Fraud Prevention Headers;1.0;PUBLIC
 userid-recovery-api;User ID Recovery;1.0;PRIVATE;public/api/documentation
+vat-api;VAT (MTD);1.0;PUBLIC;public/api/conf
 vat-registered-companies-api;Check a UK VAT number;1.0;PUBLIC;public/api/conf
-voice-biometrics;Voice Biometrics;1.1;PRIVATE;/public/api/conf
+voice-biometrics;Voice Biometrics;1.1;PRIVATE;public/api/conf

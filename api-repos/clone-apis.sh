@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
+git clone git@github.com:hmrc/address-lookup.git
 git clone git@github.com:hmrc/agent-authorisation-api.git
 git clone git@github.com:hmrc/agent-authorisation-test-support-api.git
 git clone git@github.com:hmrc/api-example-microservice.git
 git clone git@github.com:hmrc/api-notification-pull.git
 git clone git@github.com:hmrc/api-platform-test-user.git
 git clone git@github.com:hmrc/apprenticeship-levy.git
+git clone git@github.com:hmrc/bank-account-reputation.git
 git clone git@github.com:hmrc/breathing-space-if-dynamic-stub.git
 git clone git@github.com:hmrc/breathing-space-if-proxy.git
 git clone git@github.com:hmrc/business-details-api.git
@@ -100,6 +102,7 @@ git clone git@github.com:hmrc/state-pension.git
 git clone git@github.com:hmrc/state-pension-calculation.git
 git clone git@github.com:hmrc/submission-tracker.git
 git clone git@github.com:hmrc/telephony-identity-verification-api.git
+git clone git@github.com:hmrc/telephony-identity-verification-test-api.git
 git clone git@github.com:hmrc/transit-movement-api.git
 git clone git@github.com:hmrc/txm-fph-validator-api.git
 git clone git@github.com:hmrc/userid-recovery-api.git

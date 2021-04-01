@@ -15,8 +15,12 @@ import scala.concurrent.java8.FuturesConvertersImpl
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos.RepoFileExport
 import _root_.repos.GenerateGitCloneBashScript
 
-object Main extends App {
-  // GenerateGitCloneBashScript.printScript(RepoFileExport.csvApisToProcess()
-  
-  RepoFileExport.generateOasFiles()
+object Main extends App { 
+
+  args.toList match {
+    case "--help" :: Nil => println("Print usage instructions")
+    case "--generateGitClone" :: Nil => GenerateGitCloneBashScript.printScript(RepoFileExport.csvApisToProcess())
+    case "--generateOas" :: Nil => RepoFileExport.generateOasFiles()
+    case unknown => println(s"Unrecognised arguments: $unknown")
+  }
 }

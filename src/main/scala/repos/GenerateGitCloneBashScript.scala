@@ -9,7 +9,6 @@ object GenerateGitCloneBashScript {
       .map(api => s"git clone git@github.com:hmrc/${api.name}.git")
       .mkString("\n")
   
-    print(text)
-
+    println(text)
   }
 }

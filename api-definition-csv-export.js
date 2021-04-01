@@ -75,7 +75,7 @@ function toCsv(list){
 	return lines.join('\n');
 }
 
-//db = db.getSiblingDB("api-definition-external-test")
+db = db.getSiblingDB("api-definition")
 
 var c = db.api.aggregate([{
     $unwind: "$versions"
