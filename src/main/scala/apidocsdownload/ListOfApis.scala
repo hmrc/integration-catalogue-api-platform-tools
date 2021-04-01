@@ -1,6 +1,6 @@
+package uk.gov.hmrc.integrationcatalogueapiplatformtools.apidocsdownload
+
 case class Api(serviceName: String, version: String)
-
-
 
 object ListOfApis {
     val apisCsv = """
