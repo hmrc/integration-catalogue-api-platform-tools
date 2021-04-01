@@ -40,7 +40,7 @@ object RepoFileExport {
   }
 
   def csvApisToProcess() : Seq[CsvApiRecord] = {
-      val in = new FileReader("apis-to-import.csv")
+      val in = new FileReader("api-definition-csv-export.csv")
 
       org.apache.commons.csv.CSVFormat.EXCEL
         .withFirstRecordAsHeader()

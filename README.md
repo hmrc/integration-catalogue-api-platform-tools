@@ -34,7 +34,7 @@ This uses this library for parsing RAML and converting to OAS 3: [webapi-parser]
 # Steps
 
 1. Run 'api-definition-csv-export.js' on Mongo Jenkins job in an environment (e.g. `External Test`)
-1. Copy output over 'apis-to-import'
+1. Copy output over 'api-definition-csv-export.csv'
 1. Diff and re-add any raml override paths in the CSV.
 1. Generate the git clone command
     ```
