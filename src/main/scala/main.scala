@@ -1,9 +1,11 @@
+import amf.client.model.domain.WebApi
+
 import java.io.FileReader
 import org.apache.commons.csv.CSVRecord
+
 import scala.collection.JavaConverters._
-import webapi.WebApiBaseUnit
-import webapi.Raml10
-import webapi.Oas30
+import webapi.{Oas30, Raml10, WebApiBaseUnit, WebApiDocument}
+
 import java.util.concurrent.TimeUnit
 import scala.util.Try
 import scala.util.Failure
@@ -13,7 +15,23 @@ import scala.concurrent.java8.FuturesConvertersImpl
 
 object Main extends App {
 
-  case class Api(name: String, version: String, ramlPath : Option[String])
+  object AccessType {
+    def apply(text: Option[String]) : AccessType = {
+      text.map(_.toUpperCase()) match {
+        case None => Public()
+        case Some("PUBLIC") => Public()
+        case Some("PRIVATE") => Private()
+        case Some("BOTH") => Public()
+        case Some("") => Public()
+        case other => throw new RuntimeException(s"Unknown accessType: $other")
+      }
+    }
+  }
+  sealed trait AccessType;
+  case class Public() extends AccessType
+  case class Private() extends AccessType
+
+  case class Api(name: String, version: String, accessType: AccessType, ramlPath : Option[String])
 
   def createRecord(record: CSVRecord) : Api = {
 
@@ -22,9 +40,11 @@ object Main extends App {
         Some(record.get(4))
       } else None
 
+
     Api(
       record.get(0),
       record.get(2),
+      AccessType(Option(record.get(3))),
       ramlPath
     )
   }
@@ -50,13 +70,40 @@ object Main extends App {
 
   def parseRamlFromGitRepo(apis: Seq[Api]) : Unit = {
 
+    def addAccessType(model : WebApiDocument, api: Api) = {
+
+      val webApi : WebApi = model.encodes.asInstanceOf[WebApi]
+
+      val accessTypeDescription = api.accessType match {
+        case Public() => "This is a public API."
+        case Private() => "This is a private API."
+      }
+
+      
+
+      Option(webApi.description) match {
+        case None => webApi.withDescription(accessTypeDescription)
+        case Some(x) if x.isNullOrEmpty => webApi.withDescription(accessTypeDescription)
+        case Some(currentDescription) => webApi.withDescription(webApi.description + s" $accessTypeDescription")
+      }
+      // webApi.withDescription(webApi.description + s" $text")
+    }
+
     def tryParseFile(api: Api, filename: String) : Try[Unit] = {
       Try({
         // println(s"Starting API: ${api.name}, ${api.version} filename:\n${filename}")
 
-        val model : WebApiBaseUnit = Raml10.parse(filename).get()
+        val model : WebApiDocument = Raml10.parse(filename).get().asInstanceOf[WebApiDocument]
 
         val outputFilepath = s"file://generated/${api.name}-${api.version}.yaml"
+
+        addAccessType(model, api)
+//        val webApi : WebApi = model.encodes.asInstanceOf[WebApi]
+//        webApi.withName("cheese")
+//
+//        webApi.withDescription(webApi.description + "\nThis is a public API.")
+//
+//        println(api.name)
 
         val f = Oas30.generateYamlFile(model, outputFilepath)
         f.get(60, TimeUnit.SECONDS)
