@@ -1,3 +1,5 @@
+package uk.gov.hmrc.integrationcatalogueapiplatformtools.apidocsdownload
+
 import webapi.Raml10;
 import webapi.Oas30;
 import webapi.WebApiModule;

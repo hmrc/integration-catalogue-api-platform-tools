@@ -75,7 +75,7 @@ function toCsv(list){
 	return lines.join('\n');
 }
 
-//db = db.getSiblingDB("api-definition-external-test")
+db = db.getSiblingDB("api-definition")
 
 var c = db.api.aggregate([{
     $unwind: "$versions"
@@ -84,31 +84,37 @@ var c = db.api.aggregate([{
         "versions.status" : {
             $nin : ["DEPRECATED", "RETIRED"]
         },
-        "versions.access.type" : {
-           $ne :  "PRIVATE"
-        }
+//         "versions.access.type" : {
+//            $ne :  "PRIVATE"
+//         }
     }
 },{
      $project: {
          _id: 0,
          serviceName : "$serviceName",
          name: "$name",
-         description: "$description",
-         version : "$versions.version"
+//          description: "$description",
+         version : "$versions.version",
+         type :  { 
+             $ifNull: [ "$versions.access.type", "PUBLIC" ]
+         }
+         
      }
 },{
     $group: {
         _id: {
             "serviceName" : "$serviceName",
             "name" : "$name",
-            "description": "$description",
+//             "description": "$description",
         },
         versions: {
             $max : "$version"
+        },
+        "type" : {
+            $addToSet: "$type"
         }
     }
 }
-
 ,{
  	 $sort: {
  		 "_id.serviceName": 1,
