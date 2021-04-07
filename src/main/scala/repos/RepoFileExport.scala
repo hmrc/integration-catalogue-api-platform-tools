@@ -53,7 +53,7 @@ object RepoFileExport {
     Try({
       val model : WebApiDocument = Raml10.parse(filename).get().asInstanceOf[WebApiDocument]
 
-      val outputFilepath = s"file://generated/${csvApiRecord.name}-${csvApiRecord.version}.yaml"
+      val outputFilepath = s"file://generated/${csvApiRecord.name}.yaml"
 
       addAccessTypeToDescription(model, csvApiRecord)
 

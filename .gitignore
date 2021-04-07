@@ -27,3 +27,4 @@ tmp
 yarn-debug.log
 yarn-error.log
 .bloop
+/api-repos/
