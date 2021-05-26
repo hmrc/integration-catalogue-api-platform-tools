@@ -16,6 +16,7 @@ import amf.client.model.domain.DomainElement
 import amf.client.parse._
 import amf.client.render.{Oas20Renderer, RenderOptions}
 import amf.client.resolve.Oas20Resolver
+import amf.core.client.ParsingOptions
 import amf.core.resolution.pipelines.ResolutionPipeline
 
 import java.nio.file.{Files, Paths}
@@ -64,7 +65,8 @@ object RepoFileExport {
 
       val parser = new Raml10Parser
 
-      val model: BaseUnit = parser.parseFileAsync(filename).get
+      val parsingOptions = ParsingOptions().withoutAmfJsonLdSerialization
+      val model: BaseUnit = parser.parseFileAsync(url = filename, parsingOptions).get
 
 
 

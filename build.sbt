@@ -11,8 +11,8 @@ libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.2"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.2" % "test"
 libraryDependencies += "org.apache.commons" % "commons-csv" % "1.8"
 
-libraryDependencies += "com.github.amlorg" %% "amf-webapi"      % "4.0.3"
-libraryDependencies += "com.github.amlorg" %% "amf-validation"  % "4.0.3"
+libraryDependencies += "com.github.amlorg" %% "amf-webapi"      % "4.7.3-1"
+libraryDependencies += "com.github.amlorg" %% "amf-validation"  % "5.1.5"
 
 resolvers += "Mulesoft" at "https://repository-master.mulesoft.org/nexus/content/repositories/releases"
 resolvers += "jitpack.io" at "https://jitpack.io"

@@ -3,7 +3,10 @@ package uk.gov.hmrc.integrationcatalogueapiplatformtools
 import _root_.repos.GenerateGitCloneBashScript
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos.RepoFileExport
 
+
 object Main extends App {
+
+  implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
 
   import amf.core.AMF
 
