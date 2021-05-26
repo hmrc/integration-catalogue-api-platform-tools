@@ -3,8 +3,9 @@ package uk.gov.hmrc.integrationcatalogueapiplatformtools.repos
 import amf.client.convert.CoreClientConverters.ClientOption
 import amf.client.model.document.BaseUnit
 import amf.client.parse._
-import amf.client.render.{Oas20Renderer, Oas30Renderer}
+import amf.client.render.{Oas20Renderer, Oas30Renderer, RenderOptions}
 import amf.client.resolve.{ClientErrorHandler, Oas20Resolver, Oas30Resolver}
+import amf.core.client.ParsingOptions
 import amf.core.resolution.pipelines.ResolutionPipeline
 import org.apache.commons.csv.CSVRecord
 
@@ -82,7 +83,8 @@ object RepoFileExport {
     val renderer = new Oas30Renderer()
 
 
-    val ramlApi: BaseUnit = parser.parseFileAsync(filename).get()
+    val parseOptions = ParsingOptions().withoutAmfJsonLdSerialization
+    val ramlApi: BaseUnit = parser.parseFileAsync(filename, parseOptions).get()
 
     println(s"rendering parsed Raml ${ramlApi.toString}")
     val convertedOasApi =  resolver.resolve(ramlApi, ResolutionPipeline.DEFAULT_PIPELINE, new UnhandledErrorHandler)
@@ -90,9 +92,9 @@ object RepoFileExport {
 
 
 
-
+    val renderOptions = RenderOptions().withoutAmfJsonLdSerialization
     println(s"rendering result ${convertedOasApi.toString}")
-    renderer.generateFile(convertedOasApi, outputFilepath).get
+    renderer.generateFile(convertedOasApi, outputFilepath, renderOptions).get
 
 
   })
