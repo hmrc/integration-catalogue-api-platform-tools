@@ -82,30 +82,19 @@ object RepoFileExport {
     val renderer = new Oas30Renderer()
 
 
-    val parseRamlResult: Future[BaseUnit] =
-      parser.parseFileAsync(filename).toScala
+    val ramlApi: BaseUnit = parser.parseFileAsync(filename).get()
+
+    println(s"rendering parsed Raml ${ramlApi.toString}")
+    val convertedOasApi =  resolver.resolve(ramlApi, ResolutionPipeline.DEFAULT_PIPELINE, new UnhandledErrorHandler)
 
 
-    val convertedOasApi =
-      parseRamlResult
-        .map(ramlApi => {
-          println(s"rendering parsed Raml ${ramlApi.toString}")
-          resolver.resolve(ramlApi, ResolutionPipeline.DEFAULT_PIPELINE, new UnhandledErrorHandler)
-        })
 
 
-    val result: Future[String] = convertedOasApi.flatMap(oasApi => {
-      println(s"rendering result ${oasApi.toString}")
-      renderer.generateFile(oasApi, outputFilepath).toScala
-      renderer.generateString(oasApi).toScala
-    })
+
+    println(s"rendering result ${convertedOasApi.toString}")
+    renderer.generateFile(convertedOasApi, outputFilepath).get
 
 
-    result.map(x => {
-      println(s"printing result  $x")
-      println("OUT CODE!!!!")
-    })
-    ()
   })
 
   private def createRecord(record: CSVRecord): CsvApiRecord = {

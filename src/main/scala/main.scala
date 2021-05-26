@@ -4,7 +4,7 @@ import _root_.repos.GenerateGitCloneBashScript
 import amf.plugins.document.vocabularies.AMLPlugin
 import amf.plugins.document.webapi.{Oas30Plugin, Raml10Plugin}
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos.RepoFileExport
-
+import scala.compat.java8.FutureConverters._
 
 object Main extends App {
 
@@ -17,17 +17,22 @@ object Main extends App {
 //  amf.core.AMF.registerPlugin(Raml10Plugin)
 //  amf.core.AMF.init()
 
-  AMF.registerPlugin(Oas30Plugin)
-  AMF.registerPlugin(Raml10Plugin)
-  AMF.init()
- .map({something: Unit =>
-    args.toList match {
-      case "--help" :: Nil => println("Print usage instructions")
-      case "--generateGitClone" :: Nil => GenerateGitCloneBashScript.printScript(RepoFileExport.csvApisToProcess())
-      case "--generateOas" :: Nil => RepoFileExport.generateOasFiles()
-      case unknown => println(s"Unrecognised arguments: $unknown")
-    }
-  })
+  import amf.Core
+  import amf.plugins.document.WebApi
+
+
+  WebApi.register()
+  Core.registerPlugin(Oas30Plugin)
+  Core.registerPlugin(Raml10Plugin)
+  Core.init().get
+
+  args.toList match {
+    case "--help" :: Nil => println("Print usage instructions")
+    case "--generateGitClone" :: Nil => GenerateGitCloneBashScript.printScript(RepoFileExport.csvApisToProcess())
+    case "--generateOas" :: Nil => RepoFileExport.generateOasFiles()
+    case unknown => println(s"Unrecognised arguments: $unknown")
+  }
+
 
 
 }
