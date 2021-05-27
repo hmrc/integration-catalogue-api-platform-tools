@@ -60,7 +60,6 @@ object RepoFileExport {
   }
 
   def generateOasFiles()(implicit ec: ExecutionContext) = {
-    println("**** HELLO *** ")
     csvApisToProcess.foreach(parseRaml)
   }
 
@@ -75,7 +74,7 @@ object RepoFileExport {
   }
 
   private def tryParseFile(csvApiRecord: CsvApiRecord, filename: String)(implicit ec: ExecutionContext): Try[Unit] = Try({
-    println("IN CODE!!!!")
+
     val outputFilepath = s"file://generated/${csvApiRecord.name}.yaml"
 
     val parser = new Raml10Parser()
@@ -83,17 +82,15 @@ object RepoFileExport {
     val renderer = new Oas30Renderer()
 
 
-    val parseOptions = ParsingOptions().withoutAmfJsonLdSerialization
+    val parseOptions = ParsingOptions()
     val ramlApi: BaseUnit = parser.parseFileAsync(filename, parseOptions).get()
 
-    println(s"rendering parsed Raml ${ramlApi.toString}")
     val convertedOasApi =  resolver.resolve(ramlApi, ResolutionPipeline.DEFAULT_PIPELINE, new UnhandledErrorHandler)
 
 
 
 
-    val renderOptions = RenderOptions().withoutAmfJsonLdSerialization
-    println(s"rendering result ${convertedOasApi.toString}")
+    val renderOptions = RenderOptions().withCompactedEmission
     renderer.generateFile(convertedOasApi, outputFilepath, renderOptions).get
 
 
@@ -127,17 +124,15 @@ object RepoFileExport {
   //  }
 
   private def parseRaml(csvApiRecord: CsvApiRecord)(implicit ec: ExecutionContext): Unit = {
-    println(s"parsing $csvApiRecord")
+
     val ramlPath = csvApiRecord.ramlPathOverride.getOrElse("resources/public/api/conf")
     val filename = s"file://api-repos/${csvApiRecord.name}/$ramlPath/${csvApiRecord.version}/application.raml"
 
     tryParseFile(csvApiRecord, filename) match {
       case Failure(exception) => {
-        exception.printStackTrace()
         println(s"parse Raml failed: ${csvApiRecord.name}, ${csvApiRecord.version} - filename: ${filename} ${exception.toString}")
       }
       case Success(_) => {
-        println("seems ok!!")
         Unit
       }
     }

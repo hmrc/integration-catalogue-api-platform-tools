@@ -10,12 +10,6 @@ object Main extends App {
 
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
 
-  import amf.core.AMF
-
-//  amf.core.AMF.registerPlugin(AMLPlugin)
-//  amf.core.AMF.registerPlugin(Oas30Plugin)
-//  amf.core.AMF.registerPlugin(Raml10Plugin)
-//  amf.core.AMF.init()
 
   import amf.Core
   import amf.plugins.document.WebApi
