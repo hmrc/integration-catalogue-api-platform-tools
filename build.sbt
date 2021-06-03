@@ -7,6 +7,7 @@ lazy val root = (project in file(".")).
     name := "integration-catalogue-api-platform-tools"
   )
 
+libraryDependencies += "io.swagger.parser.v3" % "swagger-parser-v3" % "2.0.24"
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.2"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.2" % "test"
 libraryDependencies += "org.apache.commons" % "commons-csv" % "1.8"
