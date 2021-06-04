@@ -1,24 +1,14 @@
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.repos
 
 import amf.client.model.domain.WebApi
-import io.swagger.v3.core.util.Yaml
-import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.parser.OpenAPIV3Parser
-import io.swagger.v3.parser.core.models.{ParseOptions, SwaggerParseResult}
-
-import java.io.FileReader
+import openapi.{ExtensionKeys, OpenApiEnhancements}
 import org.apache.commons.csv.CSVRecord
-
-import scala.collection.JavaConverters._
 import webapi.{Oas30, Raml10, WebApiBaseUnit, WebApiDocument}
 
-import java.util.HashMap
+import java.io.FileReader
 import java.util.concurrent.{CompletableFuture, TimeUnit}
-import scala.util.Try
-import scala.util.Failure
-import scala.util.Success
-import scala.concurrent.java8.FuturesConvertersImpl
-import repos.ExtensionKeys
+import scala.collection.JavaConverters._
+import scala.util.{Failure, Success, Try}
 
 sealed trait AccessType;
 
@@ -41,7 +31,7 @@ object AccessType {
 
 case class CsvApiRecord(name: String, version: String, accessType: AccessType, ramlPathOverride: Option[String])
 
-object RepoFileExport extends ExtensionKeys {
+object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
 
   def generateOasFiles() = {
     csvApisToProcess.foreach(parseRaml)
@@ -57,41 +47,8 @@ object RepoFileExport extends ExtensionKeys {
       .map(createRecord)
   }
 
-  def getListSafe(list: java.util.List[String]): List[String] = {
-    Option(list)
-      .map(e => e.asScala.toList)
-      .getOrElse(List.empty)
-  }
 
-  def addExtensions(openApi: OpenAPI, apiName: String): OpenAPI = {
-    val sublevelExtensions = new HashMap[String, AnyRef]()
 
-    sublevelExtensions.put(PLATFORM_EXTENSION_KEY, "API_PLATFORM")
-    sublevelExtensions.put(PUBLISHER_REF_EXTENSION_KEY, apiName)
-
-    val topLevelExtensionsMap = new HashMap[String, AnyRef]()
-    topLevelExtensionsMap.put(EXTENSIONS_KEY, sublevelExtensions)
-
-    openApi.setExtensions(topLevelExtensionsMap)
-
-    openApi
-
-  }
-
-  def openApiToContent(openApi: OpenAPI): String = {
-    Yaml.mapper().writeValueAsString(openApi)
-  }
-
-  def addOasSpecAttributes(yamlFileAsString: CompletableFuture[String], apiName: String): Option[OpenAPI] = {
-    val options: ParseOptions = new ParseOptions()
-    options.setResolve(false)
-    val maybeSwaggerParseResult: Option[SwaggerParseResult] = Option(new OpenAPIV3Parser().readContents(yamlFileAsString.get(60, TimeUnit.SECONDS), null, options))
-    maybeSwaggerParseResult.map(swaggerParseResult =>
-      (Option(swaggerParseResult.getOpenAPI), getListSafe(swaggerParseResult.getMessages)) match {
-        case (Some(openApi), messages) => addExtensions(openApi, apiName)
-      })
-
-  }
 
   private def tryParseFile(csvApiRecord: CsvApiRecord, filename: String): Try[Unit] = {
     Try({
@@ -99,16 +56,14 @@ object RepoFileExport extends ExtensionKeys {
 
       val apiName = csvApiRecord.name
 
-      val outputFilepath = s"file://generated/${csvApiRecord.name}.yaml"
+      val outputFilepath = s"generated/${csvApiRecord.name}.yaml"
 
       addAccessTypeToDescription(model, csvApiRecord)
       val yamlFileAsString: CompletableFuture[String] = Oas30.generateYamlString(model)
 
       addOasSpecAttributes(yamlFileAsString, apiName) match {
-        case Some(openApi) => {
-          val openApiAsString = openApiToContent(openApi)
-          val webApi = Oas30.parse(openApiAsString)
-          writeYamlFile(webApi.get, outputFilepath)
+        case Some(openApiAsString) => {
+          writeToFile(outputFilepath, openApiAsString)
         }
         case None => { // fallback case
           writeYamlFile(model, outputFilepath)
@@ -122,6 +77,15 @@ object RepoFileExport extends ExtensionKeys {
     f.get(60, TimeUnit.SECONDS)
   }
 
+  private def writeToFile(filename: String, content: String): Unit = {
+    import java.io.{BufferedWriter, File, FileWriter}
+
+    val file = new File(filename)
+    val bw = new BufferedWriter(new FileWriter(file))
+    bw.write(content)
+    bw.close()
+  }
+
   private def createRecord(record: CSVRecord): CsvApiRecord = {
     def ramlPath = if (record.size() > 4) Some(record.get(4)) else None
 
@@ -133,7 +97,7 @@ object RepoFileExport extends ExtensionKeys {
     )
   }
 
-  def addAccessTypeToDescription(model: WebApiDocument, api: CsvApiRecord) = {
+  private def addAccessTypeToDescription(model: WebApiDocument, api: CsvApiRecord) = {
 
     val webApi: WebApi = model.encodes.asInstanceOf[WebApi]
 
@@ -155,7 +119,7 @@ object RepoFileExport extends ExtensionKeys {
 
     tryParseFile(csvApiRecord, filename) match {
       case Failure(exception) => {
-        println(s"failed: ${csvApiRecord.name}, ${csvApiRecord.version} - filename: $filename ${exception.toString}")
+        println(s"failed: ${csvApiRecord.name}, ${csvApiRecord.version} - filename: $filename ${exception.toString} - stacktrace - ${exception.printStackTrace}")
       }
       case Success(value) => Unit
     }
