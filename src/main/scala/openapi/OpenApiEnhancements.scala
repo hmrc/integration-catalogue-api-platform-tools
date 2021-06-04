@@ -19,6 +19,7 @@ trait OpenApiEnhancements {
     maybeSwaggerParseResult.flatMap(swaggerParseResult =>
       (Option(swaggerParseResult.getOpenAPI), getListSafe(swaggerParseResult.getMessages)) match {
         case (Some(openApi), _) => addExtensions(openApi, apiName)
+          case(_,_) => None
       })
   }
 
@@ -43,6 +44,7 @@ trait OpenApiEnhancements {
         openApi.setInfo(info)
         Some(openApiToContent(openApi))
       }
+      case _ => None
     }
   }
 
