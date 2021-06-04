@@ -31,6 +31,9 @@ goods-movement-system-haulier-api;Goods Vehicle Movements;1.0;PUBLIC
 goods-movement-system-port-api;Goods Vehicle Movements Port;1.0;PRIVATE
 help-to-save-api;Help To Save;2.0;PRIVATE
 identity-verification;Identity Verification;1.0;PRIVATE
+import-control-entry-declaration-intervention;Safety and Security Import Notifications;1.0;PUBLIC
+import-control-entry-declaration-outcome;Safety and Security Import Outcomes;1.0;PUBLIC
+import-control-entry-declaration-store;Safety and Security Import Declarations;1.0;PUBLIC
 individual-benefits;Individual Benefits;1.1;PUBLIC
 individual-calculations-api;Individual Calculations (MTD);2.0;PUBLIC
 individual-employment;Individual Employment;1.2;PUBLIC
@@ -51,6 +54,7 @@ individuals-income-received-api;Individuals Income Received (MTD);1.0;PUBLIC
 individuals-matching-api;Individuals Matching;P1.0;PRIVATE
 individuals-reliefs-api;Individuals Reliefs (MTD);1.0;PUBLIC
 individuals-state-benefits-api;Individuals State Benefits (MTD);1.0;PUBLIC
+interest-forecasting;Interest Forecasting (IF);1.0;PRIVATE
 interest-restriction-return;Interest Restriction Return (IRR);1.0;PUBLIC;public/api/conf
 iv-orchestration;IV Orchestration;1.0;PRIVATE
 lisa-api;Lifetime ISA;2.0;PUBLIC
@@ -71,6 +75,7 @@ mobile-user-contact;Mobile User Contact;1.0;PRIVATE
 national-insurance;National Insurance;1.1;PUBLIC
 national-insurance-des-stub;National Insurance Test Support;1.0;PUBLIC
 national-insurance-record;National Insurance Record;1.0;PRIVATE;public/api/conf
+native-apps-api-orchestration;Native Apps API Orchestration;1.0;PRIVATE
 oauth;OAuth;1.0;PRIVATE
 obligations-api;Obligations (MTD);1.0;PUBLIC
 openid-connect-userinfo;User Information;1.1;PRIVATE;public/api/conf
@@ -78,6 +83,7 @@ other-deductions-api;Other Deductions (MTD);1.0;PUBLIC
 paye-des-stub;Individual PAYE Test Support;1.0;PUBLIC
 payments-bin-check;Payments Bin Check;1.0;PRIVATE;public/api/conf
 payments-processor;Charge Ref Notification;1.0;PRIVATE
+personal-income;Personal Income;1.0;PRIVATE
 property-business-api;Property Business (MTD);1.0;PUBLIC
 push-pull-notifications-api;Push Pull Notifications;1.0;PUBLIC
 ras-api;Relief At Source;2.0;PUBLIC
@@ -85,17 +91,23 @@ real-time-income-information;Real Time Income Information;1.0;PRIVATE;public/api
 secure-data-exchange-bulk-download;Bulk Data File List;1.0;PUBLIC;public/api/conf
 secure-data-exchange-notifications;Secure Data Exchange Notifications;1.0;PRIVATE
 self-assessment-accounts-api;Self Assessment Accounts (MTD);1.0;PUBLIC
+self-assessment-api;Self Assessment (MTD);2.0;PUBLIC
 self-assessment-biss-api;Business Income Source Summary (MTD);1.0;PUBLIC
 self-assessment-bsas-api;Business Source Adjustable Summary (MTD);2.0;PUBLIC
+sso;Sso In;1.0;PRIVATE
+sso-frontend;Web Session;1.0;PUBLIC
 sso-session-api;Web Session API;1.0;PRIVATE;public/api/conf
 sso-session-link-api;Sso In API;1.0;PRIVATE;public/api/conf
 state-pension;State Pension;1.0;PRIVATE;public/api/conf
 state-pension-calculation;Get State Pension Calculation;1.0;PRIVATE;public/api/conf
+statement-of-liability;Statement of Liability (SOL);1.0;PRIVATE
 submission-tracker;Submission Tracker;1.0;PRIVATE
+tax-free-childcare-parent;Tax-Free Childcare Applicant;1.0;PRIVATE
 telephony-identity-verification-api;Telephony Identity Verification;1.0;PRIVATE
 telephony-identity-verification-test-api;Telephony Identity Verification Test;1.0;PRIVATE
 transit-movement-api;Transit Movement;1.0;PRIVATE
 txm-fph-validator-api;Test Fraud Prevention Headers;1.0;PUBLIC
 userid-recovery-api;User ID Recovery;1.0;PRIVATE;public/api/documentation
+vat-api;VAT (MTD);1.0;PUBLIC
 vat-registered-companies-api;Check a UK VAT number;1.0;PUBLIC;public/api/conf
 voice-biometrics;Voice Biometrics;1.1;PRIVATE;public/api/conf
