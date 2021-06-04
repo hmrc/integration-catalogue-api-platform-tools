@@ -119,7 +119,7 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
 
     tryParseFile(csvApiRecord, filename) match {
       case Failure(exception) => {
-        println(s"failed: ${csvApiRecord.name}, ${csvApiRecord.version} - filename: $filename ${exception.toString} - stacktrace - ${exception.printStackTrace}")
+        println(s"failed: ${csvApiRecord.name}, ${csvApiRecord.version} - filename: ${filename} ${exception.toString}")
       }
       case Success(value) => Unit
     }
