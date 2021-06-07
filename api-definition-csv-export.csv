@@ -51,6 +51,7 @@ individuals-income-received-api;Individuals Income Received (MTD);1.0;PUBLIC
 individuals-matching-api;Individuals Matching;P1.0;PRIVATE
 individuals-reliefs-api;Individuals Reliefs (MTD);1.0;PUBLIC
 individuals-state-benefits-api;Individuals State Benefits (MTD);1.0;PUBLIC
+interest-forecasting;Interest Forecasting (IF);1.0;PRIVATE
 interest-restriction-return;Interest Restriction Return (IRR);1.0;PUBLIC;public/api/conf
 iv-orchestration;IV Orchestration;1.0;PRIVATE
 lisa-api;Lifetime ISA;2.0;PUBLIC
@@ -91,7 +92,9 @@ sso-session-api;Web Session API;1.0;PRIVATE;public/api/conf
 sso-session-link-api;Sso In API;1.0;PRIVATE;public/api/conf
 state-pension;State Pension;1.0;PRIVATE;public/api/conf
 state-pension-calculation;Get State Pension Calculation;1.0;PRIVATE;public/api/conf
+statement-of-liability;Statement of Liability (SOL);1.0;PRIVATE
 submission-tracker;Submission Tracker;1.0;PRIVATE
+tax-free-childcare-parent;Tax-Free Childcare Applicant;1.0;PRIVATE
 telephony-identity-verification-api;Telephony Identity Verification;1.0;PRIVATE
 telephony-identity-verification-test-api;Telephony Identity Verification Test;1.0;PRIVATE
 transit-movement-api;Transit Movement;1.0;PRIVATE
