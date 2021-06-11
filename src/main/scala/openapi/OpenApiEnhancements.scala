@@ -16,11 +16,11 @@ trait OpenApiEnhancements {
     val options: ParseOptions = new ParseOptions()
     options.setResolve(false)
     val maybeSwaggerParseResult: Option[SwaggerParseResult] = Option(new OpenAPIV3Parser().readContents(yamlFileAsString.get(60, TimeUnit.SECONDS), null, options))
-    maybeSwaggerParseResult.flatMap(swaggerParseResult =>
-      (Option(swaggerParseResult.getOpenAPI), getListSafe(swaggerParseResult.getMessages)) match {
-        case (Some(openApi), _) => addExtensions(openApi, apiName)
-          case(_,_) => None
-      })
+    maybeSwaggerParseResult.flatMap(swaggerParseResult => Option(swaggerParseResult.getOpenAPI))
+      .map(addExtensions(_, apiName)
+        .map(fixShortDescription)
+        .map(openApiToContent).getOrElse(""))
+
   }
 
   private def getListSafe(list: java.util.List[String]): List[String] = {
@@ -29,7 +29,7 @@ trait OpenApiEnhancements {
       .getOrElse(List.empty)
   }
 
-  private def addExtensions(openApi: OpenAPI, apiName: String): Option[String] = {
+  private def addExtensions(openApi: OpenAPI, apiName: String): Option[OpenAPI] = {
     val subLevelExtensions = new HashMap[String, AnyRef]()
 
     subLevelExtensions.put(PLATFORM_EXTENSION_KEY, "API_PLATFORM")
@@ -38,14 +38,16 @@ trait OpenApiEnhancements {
     val topLevelExtensionsMap = new HashMap[String, AnyRef]()
     topLevelExtensionsMap.put(EXTENSIONS_KEY, subLevelExtensions)
 
-    Option(openApi.getInfo) match {
-      case Some(info) => {
+    Option(openApi.getInfo).map(info => {
         info.setExtensions(topLevelExtensionsMap)
         openApi.setInfo(info)
-        Some(openApiToContent(openApi))
-      }
-      case _ => None
-    }
+        openApi
+    })
+     
+  }
+
+  private def fixShortDescription(openApi: OpenAPI): OpenAPI = {
+    openApi
   }
 
   private def openApiToContent(openApi: OpenAPI): String = {
