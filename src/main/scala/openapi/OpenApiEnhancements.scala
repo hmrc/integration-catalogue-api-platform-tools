@@ -12,13 +12,12 @@ import scala.collection.JavaConverters._
 
 trait OpenApiEnhancements {
 
-  def addOasSpecAttributes(yamlFileAsString: CompletableFuture[String], apiName: String): Option[String] = {
+  def addOasSpecAttributes(yamlFileAsString: String, apiName: String): Option[String] = {
     val options: ParseOptions = new ParseOptions()
     options.setResolve(false)
-    val maybeSwaggerParseResult: Option[SwaggerParseResult] = Option(new OpenAPIV3Parser().readContents(yamlFileAsString.get(60, TimeUnit.SECONDS), null, options))
+    val maybeSwaggerParseResult: Option[SwaggerParseResult] = Option(new OpenAPIV3Parser().readContents(yamlFileAsString, null, options))
     maybeSwaggerParseResult.flatMap(swaggerParseResult => Option(swaggerParseResult.getOpenAPI))
       .map(addExtensions(_, apiName)
-        .map(fixShortDescription)
         .map(openApiToContent).getOrElse(""))
 
   }
@@ -44,10 +43,6 @@ trait OpenApiEnhancements {
         openApi
     })
      
-  }
-
-  private def fixShortDescription(openApi: OpenAPI): OpenAPI = {
-    openApi
   }
 
   private def openApiToContent(openApi: OpenAPI): String = {

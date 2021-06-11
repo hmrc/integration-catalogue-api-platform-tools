@@ -1,7 +1,6 @@
 
 
 !.gitignore
-.*
 .history
 *.iws
 /.classpath
@@ -27,4 +26,7 @@ tmp
 yarn-debug.log
 yarn-error.log
 .bloop
-/api-repos/
+/api-repos/*
+/.bsp/*
+/.metals/*
+/.vscode/*
