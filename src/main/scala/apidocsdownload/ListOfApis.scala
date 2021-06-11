@@ -1,7 +1,7 @@
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.apidocsdownload
 
 case class Api(serviceName: String, version: String)
-
+// $COVERAGE-OFF$
 object ListOfApis {
     val apisCsv = """
 agent-authorisation-api,1.0
@@ -52,9 +52,14 @@ self-assessment-accounts-api,1.0
 txm-fph-validator-api,1.0
 vat-api,1.0
 """
+// $COVERAGE-ON$
 
   def apis() : Seq[Api] = {
-    apisCsv
+    apisCsvToString(apisCsv)
+  }
+
+  def apisCsvToString(apisCsv: String) ={
+     apisCsv
       .split("\n")
       .filter(row => row.trim.nonEmpty)
       .filter(row => !row.startsWith("//"))

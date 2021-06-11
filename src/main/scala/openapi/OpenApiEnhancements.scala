@@ -22,12 +22,6 @@ trait OpenApiEnhancements {
 
   }
 
-  private def getListSafe(list: java.util.List[String]): List[String] = {
-    Option(list)
-      .map(e => e.asScala.toList)
-      .getOrElse(List.empty)
-  }
-
   private def addExtensions(openApi: OpenAPI, apiName: String): Option[OpenAPI] = {
     val subLevelExtensions = new HashMap[String, AnyRef]()
 
