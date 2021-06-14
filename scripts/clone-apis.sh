@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+cd ../api_repos
+
+
 git clone git@github.com:hmrc/address-lookup.git
 git clone git@github.com:hmrc/agent-authorisation-api.git
 git clone git@github.com:hmrc/agent-authorisation-test-support-api.git
