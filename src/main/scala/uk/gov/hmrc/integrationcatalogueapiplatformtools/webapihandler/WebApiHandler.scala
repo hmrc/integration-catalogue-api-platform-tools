@@ -12,12 +12,12 @@ import scala.concurrent.Future
 
 trait WebApiHandler {
 
-  def parseRamlFromFileName(fileName: String) = {
+  def parseRamlFromFileName(fileName: String): Future[WebApiDocument] = {
     FutureConverters.toScala(Raml10.parse(fileName)).map(_.asInstanceOf[WebApiDocument])
   }
 
-  def parseOasFromWebApiModel(model: WebApiDocument) = {
-    FutureConverters.toScala(Oas30.generateYamlString(model))
+  def parseOasFromWebApiModel(model: WebApiDocument, apiName: String) = {
+    FutureConverters.toScala(Oas30.generateYamlString(model)).map(x => (apiName, x))
   }
 
 // def tryParseFile(csvApiRecord: CsvApiRecord, filename: String): String = {
@@ -40,7 +40,7 @@ trait WebApiHandler {
 //  )}
 //  }
 
-  def addAccessTypeToDescription(model: WebApiDocument, api: CsvApiRecord) = {
+  def addAccessTypeToDescription(model: WebApiDocument, api: CsvApiRecord): WebApi = {
 
     val webApi: WebApi = model.encodes.asInstanceOf[WebApi]
 
@@ -56,11 +56,9 @@ trait WebApiHandler {
     }
   }
 
-  def getFileNameForCsvRecord(fCsvApiRecord: Future[CsvApiRecord]) = {
-    fCsvApiRecord.map({ csvApiRecord => 
+  def getFileNameForCsvRecord(csvApiRecord: CsvApiRecord): String = {
     val ramlPath = csvApiRecord.ramlPathOverride.getOrElse("resources/public/api/conf")
     s"file://api-repos/${csvApiRecord.name}/$ramlPath/${csvApiRecord.version}/application.raml"
-    }) 
   }
 
   def parseRaml(csvApiRecord: CsvApiRecord): Unit = {
