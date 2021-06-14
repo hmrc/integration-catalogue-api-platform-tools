@@ -1,6 +1,6 @@
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.repos
 
-
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
 
 object GenerateGitCloneBashScript {
   def printScript(apisToProcess: Seq[CsvApiRecord]): String = {

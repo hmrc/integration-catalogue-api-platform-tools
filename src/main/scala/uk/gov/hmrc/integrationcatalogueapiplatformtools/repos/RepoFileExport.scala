@@ -11,43 +11,14 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 import scala.compat.java8._
 import scala.concurrent.ExecutionContext.Implicits.global
-
-sealed trait AccessType
-
-case class Public() extends AccessType
-
-case class Private() extends AccessType
-
-object AccessType {
-
-  def apply(text: Option[String]): AccessType = {
-    text.map(_.toUpperCase()) match {
-      case None            => Public()
-      case Some("PUBLIC")  => Public()
-      case Some("PRIVATE") => Private()
-      case Some("BOTH")    => Public()
-      case Some("")        => Public()
-      case other           => throw new RuntimeException(s"Unknown accessType: $other")
-    }
-  }
-}
-
-case class CsvApiRecord(name: String, version: String, accessType: AccessType, ramlPathOverride: Option[String])
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.csv.CsvUtils
+import uk.gov.hmrc.integrationcatalogueapiplatformtools
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
 
 object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
 
-  def generateOasFiles(): Unit = {
-    csvApisToProcess().foreach(parseRaml)
-  }
-
-  def csvApisToProcess(): Seq[CsvApiRecord] = {
-    val in = new FileReader("api-definition-csv-export.csv")
-
-    org.apache.commons.csv.CSVFormat.EXCEL
-      .withFirstRecordAsHeader()
-      .withDelimiter(';')
-      .parse(in).getRecords.asScala
-      .map(createRecord)
+  def generateOasFiles(csvFilePath: String): Unit = {
+    CsvUtils.csvApisToProcess(csvFilePath).foreach(parseRaml)
   }
 
   private def tryParseFile(csvApiRecord: CsvApiRecord, filename: String): Try[Unit] = {
@@ -83,17 +54,6 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
     val bw = new BufferedWriter(new FileWriter(file))
     bw.write(content)
     bw.close()
-  }
-
-  private def createRecord(record: CSVRecord): CsvApiRecord = {
-    def ramlPath = if (record.size() > 4) Some(record.get(4)) else None
-
-    CsvApiRecord(
-      name = record.get(0),
-      version = record.get(2),
-      accessType = AccessType(Option(record.get(3))),
-      ramlPathOverride = ramlPath
-    )
   }
 
   private def addAccessTypeToDescription(model: WebApiDocument, api: CsvApiRecord) = {

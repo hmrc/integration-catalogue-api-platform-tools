@@ -1,0 +1,4 @@
+_id.serviceName;_id.name;versions;type.0
+address-lookup;Address Verification;1.0;PRIVATE;public/api/conf
+agent-authorisation-api;Agent Authorisation;1.0;PUBLIC
+agent-authorisation-test-support-api;Agent Authorisation Test Support;1.0;BOTH
