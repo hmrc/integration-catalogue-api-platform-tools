@@ -13,21 +13,49 @@ import scala.compat.java8._
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.csv.CsvUtils
 import uk.gov.hmrc.integrationcatalogueapiplatformtools
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler.WebApiHandler
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
+import scala.concurrent.Future
 
-object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
+object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApiHandler {
 
   def generateOasFiles(csvFilePath: String): Unit = {
-    CsvUtils.csvApisToProcess(csvFilePath).foreach(parseRaml)
+    //CsvUtils.csvApisToProcess(csvFilePath).foreach(parseRaml)
+    val records: Seq[Future[CsvApiRecord]] = CsvUtils.csvApisToProcess(csvFilePath).map(Future.successful(_))
+   val yaparseRaml =  for{
+      records <- Future.sequence(records)
+      record <- records
+      model <- Future.successful(getFileNameForCsvRecord(record))
+      modelWithDescription <- Future.successful(model)
+    } yield modelWithDescription
+
+    // get csvrecords as seq
+    // get raml for csvrecord
+    // modify model with description
+    // turn into OAs
+    // clean up oas and add our extensions
+    // write file
   }
 
   private def tryParseFile(csvApiRecord: CsvApiRecord, filename: String): Try[Unit] = {
+ val apiName = csvApiRecord.name
+ 
+ val outputFilepath = s"generated/${csvApiRecord.name}.yaml"
+ 
+   val fYamlString =  for{
+      model <-  parseRamlFromFileName(filename)
+      yamlString <- parseOasFromWebApiModel(model)
+
+    } yield yamlString
+
+    fYamlString.map(yamlString => 
+     addOasSpecAttributes(yamlString, apiName) match {
+            case Some(openApiAsString) => writeToFile(outputFilepath, openApiAsString)
+            case None                  => writeYamlFile(model, outputFilepath)
+          }
+    )
     Try({
-      val model: WebApiDocument = Raml10.parse(filename).get().asInstanceOf[WebApiDocument]
-
-      val apiName = csvApiRecord.name
-
-      val outputFilepath = s"generated/${csvApiRecord.name}.yaml"
+      val model: WebApiDocument = parseRamlFromFileName(filename)
 
       addAccessTypeToDescription(model, csvApiRecord)
 
@@ -56,30 +84,4 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
     bw.close()
   }
 
-  private def addAccessTypeToDescription(model: WebApiDocument, api: CsvApiRecord) = {
-
-    val webApi: WebApi = model.encodes.asInstanceOf[WebApi]
-
-    val accessTypeDescription = api.accessType match {
-      case Public()  => "This is a public API."
-      case Private() => "This is a private API."
-    }
-
-    Option(webApi.description) match {
-      case None                       => webApi.withDescription(accessTypeDescription)
-      case Some(x) if x.isNullOrEmpty => webApi.withDescription(accessTypeDescription)
-      case Some(_)   => webApi.withDescription(webApi.description + s" $accessTypeDescription")
-    }
-  }
-
-  private def parseRaml(csvApiRecord: CsvApiRecord): Unit = {
-    val ramlPath = csvApiRecord.ramlPathOverride.getOrElse("resources/public/api/conf")
-    val filename = s"file://api-repos/${csvApiRecord.name}/$ramlPath/${csvApiRecord.version}/application.raml"
-
-    tryParseFile(csvApiRecord, filename) match {
-      case Failure(exception) =>
-        println(s"failed: ${csvApiRecord.name}, ${csvApiRecord.version} - filename: $filename ${exception.toString}")
-      case Success(_)     => Unit
-    }
-  }
 }
