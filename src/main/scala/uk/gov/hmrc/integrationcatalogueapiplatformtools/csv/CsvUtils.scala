@@ -2,14 +2,17 @@ package uk.gov.hmrc.integrationcatalogueapiplatformtools.csv
 
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
 import org.apache.commons.csv.CSVRecord
-import java.io.FileReader
+
+import java.io.{FileReader, Reader}
 import scala.collection.JavaConverters._
 
 object CsvUtils {
 
   def csvApisToProcess(csvFilePath: String): Seq[CsvApiRecord] = {
-    val in = new FileReader(csvFilePath)
+    csvApisToProcessWithReader( new FileReader(csvFilePath))
+  }
 
+  def csvApisToProcessWithReader(in: Reader): Seq[CsvApiRecord] = {
     org.apache.commons.csv.CSVFormat.EXCEL
       .withFirstRecordAsHeader()
       .withDelimiter(';')
