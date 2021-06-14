@@ -13,15 +13,7 @@ class CsvUtilsSpec  extends AnyWordSpec with Matchers {
 
   "csvApisToProcess" should {
     "return a Seq of 2 CsvApiRecord's when given a csv with 2 entries" in {
-      val fileAsString = Source.fromResource("test-api-definition-csv-export.csv").mkString
-
-      println(fileAsString)
-      val is = new ByteArrayInputStream(fileAsString.getBytes )
-
-
-        val  reader = new InputStreamReader(is);
-
-      CsvUtils.csvApisToProcessWithReader( reader)
+      CsvUtils.csvApisToProcessWithReader( Source.fromResource("test-api-definition-csv-export.csv").bufferedReader())
 
     }
   }
