@@ -1,7 +1,8 @@
-package openapi
+package uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
 import scala.io.Source
 
 

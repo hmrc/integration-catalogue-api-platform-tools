@@ -1,4 +1,4 @@
-package openapi
+package uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi
 
 import io.swagger.v3.core.util.Yaml
 import io.swagger.v3.oas.models.OpenAPI
@@ -6,9 +6,7 @@ import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.{ParseOptions, SwaggerParseResult}
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos.RepoFileExport.{EXTENSIONS_KEY, PLATFORM_EXTENSION_KEY, PUBLISHER_REF_EXTENSION_KEY}
 
-import java.util.HashMap
-import java.util.concurrent.{CompletableFuture, TimeUnit}
-import scala.collection.JavaConverters._
+import java.util
 
 trait OpenApiEnhancements {
 
@@ -23,12 +21,12 @@ trait OpenApiEnhancements {
   }
 
   private def addExtensions(openApi: OpenAPI, apiName: String): Option[OpenAPI] = {
-    val subLevelExtensions = new HashMap[String, AnyRef]()
+    val subLevelExtensions = new util.HashMap[String, AnyRef]()
 
     subLevelExtensions.put(PLATFORM_EXTENSION_KEY, "API_PLATFORM")
     subLevelExtensions.put(PUBLISHER_REF_EXTENSION_KEY, apiName)
 
-    val topLevelExtensionsMap = new HashMap[String, AnyRef]()
+    val topLevelExtensionsMap = new util.HashMap[String, AnyRef]()
     topLevelExtensionsMap.put(EXTENSIONS_KEY, subLevelExtensions)
 
     Option(openApi.getInfo).map(info => {

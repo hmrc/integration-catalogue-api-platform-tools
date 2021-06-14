@@ -58,7 +58,7 @@ vat-api,1.0
     apisCsvToString(apisCsv)
   }
 
-  def apisCsvToString(apisCsv: String) ={
+  def apisCsvToString(apisCsv: String): Array[Api] ={
      apisCsv
       .split("\n")
       .filter(row => row.trim.nonEmpty)

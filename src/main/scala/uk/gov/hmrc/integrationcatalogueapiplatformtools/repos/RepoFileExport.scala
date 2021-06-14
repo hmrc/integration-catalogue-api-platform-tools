@@ -1,8 +1,8 @@
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.repos
 
 import amf.client.model.domain.WebApi
-import openapi.{ExtensionKeys, OpenApiEnhancements}
 import org.apache.commons.csv.CSVRecord
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi.{ExtensionKeys, OpenApiEnhancements}
 import webapi.{Oas30, Raml10, WebApiBaseUnit, WebApiDocument}
 
 import java.io.FileReader
@@ -10,10 +10,9 @@ import java.util.concurrent.{CompletableFuture, TimeUnit}
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 import scala.compat.java8._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
-sealed trait AccessType;
+sealed trait AccessType
 
 case class Public() extends AccessType
 
@@ -37,8 +36,8 @@ case class CsvApiRecord(name: String, version: String, accessType: AccessType, r
 
 object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
 
-  def generateOasFiles() = {
-    csvApisToProcess.foreach(parseRaml)
+  def generateOasFiles(): Unit = {
+    csvApisToProcess().foreach(parseRaml)
   }
 
   def csvApisToProcess(): Seq[CsvApiRecord] = {
@@ -47,7 +46,7 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
     org.apache.commons.csv.CSVFormat.EXCEL
       .withFirstRecordAsHeader()
       .withDelimiter(';')
-      .parse(in).getRecords().asScala.toSeq
+      .parse(in).getRecords.asScala
       .map(createRecord)
   }
 
@@ -72,7 +71,7 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
     })
   }
 
-  private def writeYamlFile(model: WebApiBaseUnit, outputFilepath: String) = {
+  private def writeYamlFile(model: WebApiBaseUnit, outputFilepath: String): Unit = {
     val f: CompletableFuture[Unit] = Oas30.generateYamlFile(model, outputFilepath)
     f.get(60, TimeUnit.SECONDS)
   }
@@ -109,7 +108,7 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
     Option(webApi.description) match {
       case None                       => webApi.withDescription(accessTypeDescription)
       case Some(x) if x.isNullOrEmpty => webApi.withDescription(accessTypeDescription)
-      case Some(currentDescription)   => webApi.withDescription(webApi.description + s" $accessTypeDescription")
+      case Some(_)   => webApi.withDescription(webApi.description + s" $accessTypeDescription")
     }
   }
 
@@ -118,10 +117,9 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements {
     val filename = s"file://api-repos/${csvApiRecord.name}/$ramlPath/${csvApiRecord.version}/application.raml"
 
     tryParseFile(csvApiRecord, filename) match {
-      case Failure(exception) => {
-        println(s"failed: ${csvApiRecord.name}, ${csvApiRecord.version} - filename: ${filename} ${exception.toString}")
-      }
-      case Success(value)     => Unit
+      case Failure(exception) =>
+        println(s"failed: ${csvApiRecord.name}, ${csvApiRecord.version} - filename: $filename ${exception.toString}")
+      case Success(_)     => Unit
     }
   }
 }

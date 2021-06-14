@@ -1,9 +1,8 @@
-package apidocsdownload
+package uk.gov.hmrc.integrationcatalogueapiplatformtools.apidocsdownload
 
-import org.scalatest.wordspec.AnyWordSpec
+
 import org.scalatest.matchers.should.Matchers
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.apidocsdownload.ListOfApis
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.apidocsdownload.Api
+import org.scalatest.wordspec.AnyWordSpec
 
 class ListOfApisSpec extends AnyWordSpec with Matchers {
 

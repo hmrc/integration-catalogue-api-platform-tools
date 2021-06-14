@@ -1,4 +1,4 @@
-package openapi
+package uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi
 
 trait ExtensionKeys {
   val EXTENSIONS_KEY = "x-integration-catalogue"

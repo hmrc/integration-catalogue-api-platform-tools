@@ -30,3 +30,4 @@ yarn-error.log
 /.bsp/*
 /.metals/*
 /.vscode/*
+api-repos/**/*
