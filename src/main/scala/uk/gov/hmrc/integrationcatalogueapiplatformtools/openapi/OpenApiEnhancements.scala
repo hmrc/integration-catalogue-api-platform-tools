@@ -23,9 +23,7 @@ trait OpenApiEnhancements {
     options.setResolve(false)
     val maybeSwaggerParseResult: Option[SwaggerParseResult] = try {
       openApiEnhancementsLogger.info("in addOasSpecAttributes 2")
-      val parser = new OpenAPIV3Parser() 
-      openApiEnhancementsLogger.info(s"have we got the yaml string?!? ${convertedOasResult.oasAsString}")
-      openApiEnhancementsLogger.info(s"have we got a parser?!? ${parser.toString}")
+      val parser = new OpenAPIV3Parser()
      val results = parser.readContents(convertedOasResult.oasAsString, null, options)
      openApiEnhancementsLogger.info(s"***** *** *** *** *** ** ${results.getMessages()}")
        Option(results)

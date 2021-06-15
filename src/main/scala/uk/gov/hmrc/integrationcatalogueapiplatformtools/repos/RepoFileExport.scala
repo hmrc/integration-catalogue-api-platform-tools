@@ -37,16 +37,6 @@ lazy val logger = Logger(LoggerFactory.getLogger("RepoFileExport"))
   }
 
 
-  def printResults(results: Seq[FileExportResult]): Unit ={
-    results.foreach(result => result match {
-      case x: SuccessfulFileExportResult => println(s"${x.apiName} successfully processed")
-      case y: FailedFileExportResult => println(s"${y.apiName} failed to process")
-    })
-    logger.info(s"A total of ${results.size} processed")
-     logger.info(s"${results.filter(x => x.isInstanceOf[SuccessfulFileExportResult]).size} successfully processed")
-     logger.info(s"${results.filter(x => x.isInstanceOf[FailedFileExportResult]).size} failed to process")
-  }
-
   def generateOasFiles(csvFilePath: String): Future[Seq[FileExportResult]] = {
 
     logger.info("in generateOasFiles 1")
@@ -65,9 +55,8 @@ lazy val logger = Logger(LoggerFactory.getLogger("RepoFileExport"))
     logger.info("in generateOasFiles 2")
     eventualOasResults
       .map(results => {
-        logger.info(s"${results.size}")
+        logger.info(s"size: ${results.size}")
         results.map(convertedWebApiToOasResult => {
-        // logger.info(convertedWebApiToOasResult.oasAsString) 
          logger.info("convertedWebApiToOasResult.oasAsString")
         addOasSpecAttributes(convertedWebApiToOasResult) match {
           case Some(openApiAsString) => 
@@ -78,6 +67,9 @@ lazy val logger = Logger(LoggerFactory.getLogger("RepoFileExport"))
                                         FailedFileExportResult(convertedWebApiToOasResult.apiName)
         }
       })})
+
+
+
 
 
   }

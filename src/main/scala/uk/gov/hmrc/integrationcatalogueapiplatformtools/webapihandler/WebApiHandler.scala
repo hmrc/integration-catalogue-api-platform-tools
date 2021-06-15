@@ -20,16 +20,16 @@ trait WebApiHandler {
   lazy val webApiHandlerLogger = Logger(LoggerFactory.getLogger("WebApiHandler"))
 
   def parseRamlFromFileName(fileName: String): Future[WebApiDocument] = {
-    val model: WebApiDocument = Raml10.parse(fileName).get().asInstanceOf[WebApiDocument]
-    webApiHandlerLogger.info(s"********* In parseRamlFromFileName - ${model.toString}")
+//    val model: WebApiDocument = Raml10.parse(fileName).get().asInstanceOf[WebApiDocument]
+//    webApiHandlerLogger.info(s"********* In parseRamlFromFileName - ${model.toString}")
+//
+//
 
-    Future.successful(model)
+     FutureConverters.toScala(Raml10.parse(fileName))
+     .map(x=>  { println(x.toString)
+                                 x.asInstanceOf[WebApiDocument]})
 
-    // FutureConverters.toScala(Raml10.parse(fileName))
-    // .map(x=>  { println(x.toString) 
-    //                             x.asInstanceOf[WebApiDocument]})
-
-    // val model: WebApiDocument = Raml10.parse(filename).get().asInstanceOf[WebApiDocument]
+//     Raml10.parse(fileName).get().asInstanceOf[WebApiDocument]
 
   }
 
