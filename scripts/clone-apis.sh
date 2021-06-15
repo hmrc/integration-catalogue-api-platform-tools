@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd ../api_repos
+cd ../api-repos
 
 
 git clone git@github.com:hmrc/address-lookup.git
@@ -58,6 +58,7 @@ git clone git@github.com:hmrc/individuals-income-received-api.git
 git clone git@github.com:hmrc/individuals-matching-api.git
 git clone git@github.com:hmrc/individuals-reliefs-api.git
 git clone git@github.com:hmrc/individuals-state-benefits-api.git
+git clone git@github.com:hmrc/interest-forecasting.git
 git clone git@github.com:hmrc/interest-restriction-return.git
 git clone git@github.com:hmrc/iv-orchestration.git
 git clone git@github.com:hmrc/lisa-api.git
@@ -103,10 +104,12 @@ git clone git@github.com:hmrc/sso-session-api.git
 git clone git@github.com:hmrc/sso-session-link-api.git
 git clone git@github.com:hmrc/state-pension.git
 git clone git@github.com:hmrc/state-pension-calculation.git
+git clone git@github.com:hmrc/statement-of-liability.git
 git clone git@github.com:hmrc/submission-tracker.git
 git clone git@github.com:hmrc/telephony-identity-verification-api.git
 git clone git@github.com:hmrc/telephony-identity-verification-test-api.git
 git clone git@github.com:hmrc/transit-movement-api.git
+git clone git@github.com:hmrc/tax-free-childcare-parent.git
 git clone git@github.com:hmrc/txm-fph-validator-api.git
 git clone git@github.com:hmrc/userid-recovery-api.git
 git clone git@github.com:hmrc/vat-api.git

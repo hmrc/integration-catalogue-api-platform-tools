@@ -14,6 +14,8 @@ libraryDependencies += "org.apache.commons" % "commons-csv" % "1.8"
 
 libraryDependencies += "org.raml" % "webapi-parser" % "0.5.0"
 
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.3"
+
 resolvers += "Mulesoft" at "https://repository-master.mulesoft.org/nexus/content/repositories/releases"
 resolvers += "jitpack.io" at "https://jitpack.io"
 

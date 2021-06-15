@@ -2,23 +2,40 @@ package uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler
 
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{ConvertedWebApiToOasResult, CsvApiRecord, Private, Public}
 import amf.client.model.domain.WebApi
-import webapi.WebApiDocument
 import webapi.{Oas30, Raml10, WebApiBaseUnit, WebApiDocument}
 
+import java.nio.file.Paths
 import scala.compat.java8._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.control.NonFatal
+import org.slf4j.LoggerFactory
+import org.apache.commons.logging.impl.Log4JLogger
+import com.typesafe.scalalogging.Logger
 
 
 
 trait WebApiHandler {
 
+  lazy val webApiHandlerLogger = Logger(LoggerFactory.getLogger("WebApiHandler"))
+
   def parseRamlFromFileName(fileName: String): Future[WebApiDocument] = {
-    FutureConverters.toScala(Raml10.parse(fileName)).map(_.asInstanceOf[WebApiDocument])
+    val model: WebApiDocument = Raml10.parse(fileName).get().asInstanceOf[WebApiDocument]
+    webApiHandlerLogger.info(s"********* In parseRamlFromFileName - ${model.toString}")
+
+    Future.successful(model)
+
+    // FutureConverters.toScala(Raml10.parse(fileName))
+    // .map(x=>  { println(x.toString) 
+    //                             x.asInstanceOf[WebApiDocument]})
+
+    // val model: WebApiDocument = Raml10.parse(filename).get().asInstanceOf[WebApiDocument]
+
   }
 
   def parseOasFromWebApiModel(model: WebApiDocument, apiName: String): Future[ConvertedWebApiToOasResult] = {
     FutureConverters.toScala(Oas30.generateYamlString(model)).map(oasAsString => ConvertedWebApiToOasResult(oasAsString, apiName))
+  
   }
 
   def addAccessTypeToDescription(model: WebApiDocument, api: CsvApiRecord): WebApi = {
@@ -39,7 +56,10 @@ trait WebApiHandler {
 
   def getFileNameForCsvRecord(csvApiRecord: CsvApiRecord): String = {
     val ramlPath = csvApiRecord.ramlPathOverride.getOrElse("resources/public/api/conf")
-    s"file://api-repos/${csvApiRecord.name}/$ramlPath/${csvApiRecord.version}/application.raml"
+    val absolutePath =Paths.get(".").toAbsolutePath.toString.replace(".","")
+    println(absolutePath)
+    s"file://${absolutePath}api-repos/${csvApiRecord.name}/$ramlPath/${csvApiRecord.version}/application.raml"
   }
+
 
 }
