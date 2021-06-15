@@ -1,16 +1,14 @@
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler
 
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.CsvApiRecord
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.Public
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.Private
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{ConvertedWebApiToOasResult, CsvApiRecord, Private, Public}
 import amf.client.model.domain.WebApi
 import webapi.WebApiDocument
 import webapi.{Oas30, Raml10, WebApiBaseUnit, WebApiDocument}
+
 import scala.compat.java8._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class ConvertedWebApiToOasResult(oasAsString: String, apiName: String)
 
 
 trait WebApiHandler {

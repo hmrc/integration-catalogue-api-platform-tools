@@ -4,7 +4,7 @@ import amf.client.model.domain.WebApi
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.csv.CsvUtils
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi.{ExtensionKeys, OpenApiEnhancements}
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler.{ConvertedWebApiToOasResult, WebApiHandler}
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler.WebApiHandler
 import webapi.{Oas30, WebApiBaseUnit, WebApiDocument}
 
 import java.util.concurrent.{CompletableFuture, TimeUnit}
@@ -21,7 +21,7 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
   }
 
 
-  def generateOasFiles(csvFilePath: String) = {
+  def generateOasFiles(csvFilePath: String): Future[Seq[FileExportResult]] = {
 
     val eventualOasResults: Future[Seq[ConvertedWebApiToOasResult]] = Future.sequence(CsvUtils.csvApisToProcess(csvFilePath)
       .map( record => {
@@ -34,60 +34,15 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
     eventualOasResults
       .map(results => results.map(convertedWebApiToOasResult => {
         addOasSpecAttributes(convertedWebApiToOasResult) match {
-          case Some(openApiAsString) => Future.successful(writeToFile( s"generated/$openApiAsString.yaml", openApiAsString))
-          case None                  => Future.failed(new RuntimeException("unable to process record"))
+          case Some(openApiAsString) => writeToFile( s"generated/$openApiAsString.yaml", openApiAsString)
+                                        SuccessfulFileExportResult(convertedWebApiToOasResult.apiName)
+          case None                  => FailedFileExportResult(convertedWebApiToOasResult.apiName)
         }
       }))
 
 
   }
 
-
-
-
-
-
-
-    // get csvrecords as seq
-    // get raml for csvrecord
-    // modify model with description
-    // turn into OAs
-    // clean up oas and add our extensions
-    // write file
-
-//
-//  private def tryParseFile(csvApiRecord: CsvApiRecord, filename: String): Try[Unit] = {
-// val apiName = csvApiRecord.name
-//
-//
-//
-//   val fYamlString =  for{
-//      model <-  parseRamlFromFileName(filename)
-//      yamlString <- parseOasFromWebApiModel(model)
-//
-//    } yield yamlString
-//
-//    fYamlString.map(yamlString =>
-//     addOasSpecAttributes(yamlString, apiName) match {
-//            case Some(openApiAsString) => writeToFile(outputFilepath, openApiAsString)
-//            case None                  => writeYamlFile(model, outputFilepath)
-//          }
-//    )
-//    Try({
-//      val model: WebApiDocument = parseRamlFromFileName(filename)
-//
-//      addAccessTypeToDescription(model, csvApiRecord)
-//
-//      FutureConverters.toScala(Oas30.generateYamlString(model))
-//        .map(yamlString => {
-//          addOasSpecAttributes(yamlString, apiName) match {
-//            case Some(openApiAsString) => writeToFile(outputFilepath, openApiAsString)
-//            case None                  => writeYamlFile(model, outputFilepath)
-//          }
-//        })
-//
-//    })
-//  }
 
   private def writeYamlFile(model: WebApiBaseUnit, outputFilepath: String): Unit = {
     val f: CompletableFuture[Unit] = Oas30.generateYamlFile(model, outputFilepath)
@@ -104,3 +59,4 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
   }
 
 }
+
