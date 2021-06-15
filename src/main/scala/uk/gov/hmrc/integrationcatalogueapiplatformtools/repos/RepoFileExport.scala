@@ -1,6 +1,5 @@
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.repos
 
-import amf.client.model.domain.WebApi
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.csv.CsvUtils
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi.{ExtensionKeys, OpenApiEnhancements}
@@ -11,9 +10,6 @@ import java.util.concurrent.{CompletableFuture, TimeUnit}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.control.NonFatal
-import org.slf4j.LoggerFactory
-import org.apache.commons.logging.impl.Log4JLogger
-import com.typesafe.scalalogging.Logger
 
 object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApiHandler {
 
