@@ -4,12 +4,13 @@ import amf.client.model.domain.WebApi
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.csv.CsvUtils
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi.{ExtensionKeys, OpenApiEnhancements}
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler.WebApiHandler
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler.{ConvertedWebApiToOasResult, WebApiHandler}
 import webapi.{Oas30, WebApiBaseUnit, WebApiDocument}
 
 import java.util.concurrent.{CompletableFuture, TimeUnit}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+
 
 object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApiHandler {
 
@@ -19,22 +20,22 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
       .map(model => addAccessTypeToDescription(model, csvApiRecord))
   }
 
-  def generateOasFiles(csvFilePath: String): Unit = {
 
-    val convertedRamlObjects: Seq[Future[(String, String)]] = CsvUtils.csvApisToProcess(csvFilePath)
-      .map( record =>{
-          csvRecordToRamlWebApiModelWithDescription(record)
-          .map(_.asInstanceOf[WebApiDocument])
-          .flatMap( model => parseOasFromWebApiModel(model, record.name))
-      })
+  def generateOasFiles(csvFilePath: String) = {
 
-    Future.sequence(convertedRamlObjects)
-      .map(results => results.map(x => {
-        val yamlFileAsString = x._1
-        val apiName = x._2
-        addOasSpecAttributes(yamlFileAsString, apiName) match {
-          case Some(openApiAsString) => writeToFile( s"generated/${apiName}.yaml", openApiAsString)
-          case None                  => throw new RuntimeException("unable to process record")
+    val eventualOasResults: Future[Seq[ConvertedWebApiToOasResult]] = Future.sequence(CsvUtils.csvApisToProcess(csvFilePath)
+      .map( record => {
+         for{
+           model <- csvRecordToRamlWebApiModelWithDescription(record)
+           convertedOasResult <- parseOasFromWebApiModel(model.asInstanceOf[WebApiDocument], record.name)
+         } yield convertedOasResult })
+    )
+
+    eventualOasResults
+      .map(results => results.map(convertedWebApiToOasResult => {
+        addOasSpecAttributes(convertedWebApiToOasResult) match {
+          case Some(openApiAsString) => Future.successful(writeToFile( s"generated/$openApiAsString.yaml", openApiAsString))
+          case None                  => Future.failed(new RuntimeException("unable to process record"))
         }
       }))
 

@@ -5,17 +5,18 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.{ParseOptions, SwaggerParseResult}
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos.RepoFileExport.{EXTENSIONS_KEY, PLATFORM_EXTENSION_KEY, PUBLISHER_REF_EXTENSION_KEY}
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler.ConvertedWebApiToOasResult
 
 import java.util
 
 trait OpenApiEnhancements {
 
-  def addOasSpecAttributes(yamlFileAsString: String, apiName: String): Option[String] = {
+  def addOasSpecAttributes(convertedOasResult: ConvertedWebApiToOasResult): Option[String] = {
     val options: ParseOptions = new ParseOptions()
     options.setResolve(false)
-    val maybeSwaggerParseResult: Option[SwaggerParseResult] = Option(new OpenAPIV3Parser().readContents(yamlFileAsString, null, options))
+    val maybeSwaggerParseResult: Option[SwaggerParseResult] = Option(new OpenAPIV3Parser().readContents(convertedOasResult.oasAsString, null, options))
     maybeSwaggerParseResult.flatMap(swaggerParseResult => Option(swaggerParseResult.getOpenAPI))
-      .map(addExtensions(_, apiName)
+      .map(addExtensions(_, convertedOasResult.apiName)
         .map(openApiToContent).getOrElse(""))
 
   }

@@ -10,35 +10,18 @@ import scala.compat.java8._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+case class ConvertedWebApiToOasResult(oasAsString: String, apiName: String)
+
+
 trait WebApiHandler {
 
   def parseRamlFromFileName(fileName: String): Future[WebApiDocument] = {
     FutureConverters.toScala(Raml10.parse(fileName)).map(_.asInstanceOf[WebApiDocument])
   }
 
-  def parseOasFromWebApiModel(model: WebApiDocument, apiName: String) = {
-    FutureConverters.toScala(Oas30.generateYamlString(model)).map(x => (apiName, x))
+  def parseOasFromWebApiModel(model: WebApiDocument, apiName: String): Future[ConvertedWebApiToOasResult] = {
+    FutureConverters.toScala(Oas30.generateYamlString(model)).map(oasAsString => ConvertedWebApiToOasResult(oasAsString, apiName))
   }
-
-// def tryParseFile(csvApiRecord: CsvApiRecord, filename: String): String = {
-//  Try({
-//   val apiName = csvApiRecord.name
-
-//  val outputFilepath = s"generated/${csvApiRecord.name}.yaml"
-
-//    val fYamlString =  for{
-//       model <-  parseRamlFromFileName(filename)
-//       yamlString <- parseOasFromWebApiModel(model)
-
-//     } yield yamlString
-//      fYamlString.map(yamlString =>
-//      addOasSpecAttributes(yamlString, apiName) match {
-//             case Some(openApiAsString) => writeToFile(outputFilepath, openApiAsString)
-//             case None                  => writeYamlFile(model, outputFilepath)
-//           }
-//     )
-//  )}
-//  }
 
   def addAccessTypeToDescription(model: WebApiDocument, api: CsvApiRecord): WebApi = {
 
@@ -61,13 +44,4 @@ trait WebApiHandler {
     s"file://api-repos/${csvApiRecord.name}/$ramlPath/${csvApiRecord.version}/application.raml"
   }
 
-  def parseRaml(csvApiRecord: CsvApiRecord): Unit = {
-  
-
-    // tryParseFile(csvApiRecord, filename) match {
-    //   case Failure(exception) =>
-    //     println(s"failed: ${csvApiRecord.name}, ${csvApiRecord.version} - filename: $filename ${exception.toString}")
-    //   case Success(_)     => Unit
-    // }
-  }
 }
