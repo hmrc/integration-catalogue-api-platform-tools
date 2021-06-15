@@ -2,6 +2,7 @@ package uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.ConvertedWebApiToOasResult
 
 import scala.io.Source
 
@@ -18,14 +19,14 @@ class OpenApiEnhancementsSpec extends AnyWordSpec with Matchers with OpenApiEnha
 
     "addOasSpecAttributes " should {
         "handle empty string" in {
-           addOasSpecAttributes("", "iamAnApi") shouldBe None
+           addOasSpecAttributes(ConvertedWebApiToOasResult("", "iamAnApi")) shouldBe None
 
         }
 
         "add integration catalogue extensions to expected yaml file" in new Setup {
           val contentsToParse = getFileContents("noIntCatExtensions.yaml")
           val expectedYaml = getFileContents("expectedWithIntCatExtensions.yaml")
-           addOasSpecAttributes(contentsToParse, "iamAnApi") shouldBe Some(expectedYaml)
+           addOasSpecAttributes(ConvertedWebApiToOasResult(contentsToParse, "iamAnApi")) shouldBe Some(expectedYaml)
 
         }
     }
