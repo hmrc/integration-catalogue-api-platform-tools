@@ -17,63 +17,40 @@ import com.typesafe.scalalogging.Logger
 
 object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApiHandler {
 
-
-lazy val logger = Logger(LoggerFactory.getLogger("RepoFileExport"))
-
-
-  def csvRecordToRamlWebApiModelWithDescription(csvApiRecord: CsvApiRecord): Future[WebApiDocument] ={
+  def csvRecordToRamlWebApiModelWithDescription(csvApiRecord: CsvApiRecord): Future[WebApiDocument] = {
     val filePath = getFileNameForCsvRecord(csvApiRecord)
-    logger.info("in csvRecordToRamlWebApiModelWithDescription")
-      logger.info(filePath)
-    logger.info(s"file exists ${checkpathExists(filePath)}")
     parseRamlFromFileName(filePath)
-      .map(model => {logger.info(s"WebApiModel: ${model.toString}")
-      addAccessTypeToDescription(model, csvApiRecord)
-    model})
+      .map(model => {
+        addAccessTypeToDescription(model, csvApiRecord)
+        model
+      })
   }
-
-  def checkpathExists(path: String) ={
-    scala.reflect.io.File(path).exists
-  }
-
 
   def generateOasFiles(csvFilePath: String): Future[Seq[FileExportResult]] = {
-
-    logger.info("in generateOasFiles 1")
     val eventualOasResults: Future[Seq[ConvertedWebApiToOasResult]] = Future.sequence(CsvUtils.csvApisToProcess(csvFilePath)
-      .map( record => {
-       
-         for{
-           model <- csvRecordToRamlWebApiModelWithDescription(record)
-           convertedOasResult <- parseOasFromWebApiModel(model, record.name)
-         } yield convertedOasResult })
-    ).recover{
+      .map(record => {
+
+        for {
+          model <- csvRecordToRamlWebApiModelWithDescription(record)
+          convertedOasResult <- parseOasFromWebApiModel(model, record.name)
+        } yield convertedOasResult
+      })).recover {
       case NonFatal(e) => e.printStackTrace()
-      throw e
+        throw e
     }
 
-    logger.info("in generateOasFiles 2")
     eventualOasResults
       .map(results => {
-        logger.info(s"size: ${results.size}")
         results.map(convertedWebApiToOasResult => {
-         logger.info("convertedWebApiToOasResult.oasAsString")
-        addOasSpecAttributes(convertedWebApiToOasResult) match {
-          case Some(openApiAsString) => 
-                                        writeToFile( s"generated/${convertedWebApiToOasResult.apiName}.yaml", openApiAsString)
-                                            logger.info("in generateOasFiles YEAH")
-                                        SuccessfulFileExportResult(convertedWebApiToOasResult.apiName)
-          case None                  =>      logger.info("in generateOasFiles No")
-                                        FailedFileExportResult(convertedWebApiToOasResult.apiName)
-        }
-      })})
-
-
-
-
+          addOasSpecAttributes(convertedWebApiToOasResult) match {
+            case Some(openApiAsString) => writeToFile(s"generated/${convertedWebApiToOasResult.apiName}.yaml", openApiAsString)
+              SuccessfulFileExportResult(convertedWebApiToOasResult.apiName)
+            case None                  => FailedFileExportResult(convertedWebApiToOasResult.apiName)
+          }
+        })
+      })
 
   }
-
 
   private def writeYamlFile(model: WebApiBaseUnit, outputFilepath: String): Unit = {
     val f: CompletableFuture[Unit] = Oas30.generateYamlFile(model, outputFilepath)
@@ -90,4 +67,3 @@ lazy val logger = Logger(LoggerFactory.getLogger("RepoFileExport"))
   }
 
 }
-

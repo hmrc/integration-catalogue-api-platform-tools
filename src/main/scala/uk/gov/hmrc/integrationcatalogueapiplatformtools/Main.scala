@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos._
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.csv.CsvUtils
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{FailedFileExportResult, FileExportResult, SuccessfulFileExportResult}
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos.RepoFileExport.logger
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,7 +18,7 @@ object Main extends App {
 
   def printResults(results: Seq[FileExportResult]): Unit ={
     results.foreach(result => result match {
-      case x: SuccessfulFileExportResult =>  logger.info(s"${x.apiName} successfully processed")
+      case x: SuccessfulFileExportResult =>  ()
       case y: FailedFileExportResult =>  logger.info(s"${y.apiName} failed to process")
     })
     logger.info(s"A total of ${results.size} processed")
