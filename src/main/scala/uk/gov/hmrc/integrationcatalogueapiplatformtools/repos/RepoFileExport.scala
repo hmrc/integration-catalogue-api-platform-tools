@@ -48,11 +48,6 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
 
   }
 
-  private def writeYamlFile(model: WebApiBaseUnit, outputFilepath: String): Unit = {
-    val f: CompletableFuture[Unit] = Oas30.generateYamlFile(model, outputFilepath)
-    f.get(60, TimeUnit.SECONDS)
-  }
-
   private def writeToFile(filename: String, content: String): Unit = {
     import java.io.{BufferedWriter, File, FileWriter}
 
