@@ -4,17 +4,16 @@ import uk.gov.hmrc.integrationcatalogueapiplatformtools.csv.CsvUtils
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi.{ExtensionKeys, OpenApiEnhancements}
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler.WebApiHandler
-import webapi.{Oas30, WebApiBaseUnit, WebApiDocument}
+import webapi.WebApiDocument
 
-import java.util.concurrent.{CompletableFuture, TimeUnit}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApiHandler {
 
-  def csvRecordToRamlWebApiModelWithDescription(csvApiRecord: CsvApiRecord): Future[WebApiDocument] = {
-    val filePath = getFileNameForCsvRecord(csvApiRecord)
+  def csvRecordToRamlWebApiModelWithDescription(csvApiRecord: CsvApiRecord, overridedRamlPath: Option[String]): Future[WebApiDocument] = {
+    val filePath = overridedRamlPath.getOrElse(getFileNameForCsvRecord(csvApiRecord))
     parseRamlFromFileName(filePath)
       .map(model => {
         addAccessTypeToDescription(model, csvApiRecord)
@@ -22,12 +21,12 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
       })
   }
 
-  def generateOasFiles(csvFilePath: String): Future[Seq[FileExportResult]] = {
+  def generateOasFiles(csvFilePath: String,  overridedRamlPath: Option[String]): Future[Seq[FileExportResult]] = {
     val eventualOasResults: Future[Seq[ConvertedWebApiToOasResult]] = Future.sequence(CsvUtils.csvApisToProcess(csvFilePath)
       .map(record => {
 
         for {
-          model <- csvRecordToRamlWebApiModelWithDescription(record)
+          model <- csvRecordToRamlWebApiModelWithDescription(record, overridedRamlPath)
           convertedOasResult <- parseOasFromWebApiModel(model, record.name)
         } yield convertedOasResult
       })).recover {
@@ -48,6 +47,7 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
 
   }
 
+  // $COVERAGE-OFF$
   private def writeToFile(filename: String, content: String): Unit = {
     import java.io.{BufferedWriter, File, FileWriter}
 
@@ -56,5 +56,5 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
     bw.write(content)
     bw.close()
   }
-
+  // $COVERAGE-ON$
 }

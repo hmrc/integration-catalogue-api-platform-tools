@@ -34,7 +34,7 @@ object Main extends App {
       val linesForBashScript = GenerateGitCloneBashScript.printScript(csvRecords)
       println(linesForBashScript)
     case "--generateOas" :: Nil => {
-      val result = RepoFileExport.generateOasFiles("api-definition-csv-export.csv")
+      val result = RepoFileExport.generateOasFiles("api-definition-csv-export.csv", None)
       result.onComplete {
         case Success(value) => printResults(value)
         case Failure(e) => logger.error("failed!!", e)

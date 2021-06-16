@@ -12,6 +12,7 @@ libraryDependencies += "org.raml" % "webapi-parser" % "0.5.0"
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.2"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.2" % "test"
 libraryDependencies += "org.apache.commons" % "commons-csv" % "1.8"
+libraryDependencies += "org.mockito" %% "mockito-scala-scalatest"  % "1.7.1"
 
 
 

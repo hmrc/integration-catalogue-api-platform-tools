@@ -7,8 +7,6 @@ import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
 import webapi.{Raml10, WebApiDocument}
 
 import java.util.concurrent.TimeUnit
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
 import scala.io.Source
 
 
