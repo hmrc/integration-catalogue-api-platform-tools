@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 trait WebApiHandler {
 
-
+  // $COVERAGE-OFF$
   def parseRamlFromFileName(fileName: String): Future[WebApiDocument] = {
     FutureConverters.toScala(Raml10.parse(fileName)).map(x =>  x.asInstanceOf[WebApiDocument])
   }
@@ -18,7 +18,7 @@ trait WebApiHandler {
   def parseOasFromWebApiModel(model: WebApiDocument, apiName: String): Future[ConvertedWebApiToOasResult] = {
     FutureConverters.toScala(Oas30.generateYamlString(model)).map(oasAsString => ConvertedWebApiToOasResult(oasAsString, apiName))
   }
-
+  // $COVERAGE-ON$
 
   def addAccessTypeToDescription(model: WebApiDocument, api: CsvApiRecord): WebApi = {
 

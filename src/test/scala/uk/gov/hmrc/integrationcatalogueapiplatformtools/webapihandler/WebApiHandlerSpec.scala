@@ -58,6 +58,16 @@ class WebApiHandlerSpec extends AnyWordSpec with Matchers with WebApiHandler {
 
       addAccessTypeToDescription(webApiDocumentWithoutDescription, csvApiRecordPublicAccess) shouldBe expectedWebApi
     }
+
+    "return webapi with private description when csvapirecord has private access and webapidocument has no description" in new Setup {
+
+      //      val webApiModel: WebApiDocument = Await.result(webApiDocumentWithoutDescription, 10 seconds)
+
+      val expectedWebApi: WebApi = webApiDocumentWithoutDescription.encodes.asInstanceOf[WebApi]
+      expectedWebApi.withDescription("This is a private API.")
+
+      addAccessTypeToDescription(webApiDocumentWithoutDescription, csvApiRecordPrivateAccess) shouldBe expectedWebApi
+    }
   }
 
 }
