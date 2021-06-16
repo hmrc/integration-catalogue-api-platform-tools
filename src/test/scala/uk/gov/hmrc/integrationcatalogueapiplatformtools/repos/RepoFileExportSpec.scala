@@ -15,6 +15,9 @@ import scala.concurrent.duration._
 import scala.concurrent.Future
 import java.nio.file.Paths
 import amf.client.model.domain.WebApi
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.ConvertedWebApiToOasResult
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.SuccessfulFileExportResult
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.FailedFileExportResult
 
 class RepoFileExportSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
@@ -26,7 +29,11 @@ class RepoFileExportSpec extends AnyWordSpec with Matchers with MockitoSugar {
         .get(5, TimeUnit.SECONDS).asInstanceOf[WebApiDocument]
     }
 
-    def absoluteFilePath = "file://" + Paths.get(".").toAbsolutePath().toString().replace(".", "") + "src/test/resources/test-ramlFile-with-description.raml"
+    def mockWriteToFile(val1: String, val2: String): Unit = {
+      ()
+    }
+
+    def absoluteRamlFilePath = "file://" + Paths.get(".").toAbsolutePath().toString().replace(".", "") + "src/test/resources/test-ramlFile-with-description.raml"
     val csvApiRecordPublicAccess = CsvApiRecord("public-apiname", "1.0", Public(), None)
     val csvApiRecordPrivateAccess = CsvApiRecord("private-apiname", "1.0", Private(), None)
 
@@ -36,10 +43,36 @@ class RepoFileExportSpec extends AnyWordSpec with Matchers with MockitoSugar {
   "csvRecordToRamlWebApiModelWithDescription" should {
     "return webapidocument when filepath is a raml file" in new Setup {
       val expectedDescription = "A description. This is a public API."
-      val result = Await.result(RepoFileExport.csvRecordToRamlWebApiModelWithDescription(csvApiRecordPublicAccess, Some(absoluteFilePath)), 10 seconds)
+      val result = Await.result(RepoFileExport.csvRecordToRamlWebApiModelWithDescription(csvApiRecordPublicAccess, Some(absoluteRamlFilePath)), 10 seconds)
 
       result.encodes.asInstanceOf[WebApi].description.value shouldBe expectedDescription
 
+    }
+  }
+
+  "processOasStrings" should {
+    "return SuccessfulFileExportResult" in new Setup {
+      val apiName = "Api Name"
+      val oasString = Source.fromResource("noIntCatExtensions.yaml").mkString
+      val oasStrings = Future.successful(Seq(ConvertedWebApiToOasResult(oasString, apiName)))
+      val result = Await.result(RepoFileExport.processOasStrings(oasStrings, mockWriteToFile), 10 seconds)
+      result shouldBe Seq(SuccessfulFileExportResult(apiName))
+    }
+
+    "return FailedFileExportResult" in new Setup {
+      val apiName = "Api Name"
+      val oasString = ""
+      val oasStrings = Future.successful(Seq(ConvertedWebApiToOasResult(oasString, apiName)))
+      val result = Await.result(RepoFileExport.processOasStrings(oasStrings, mockWriteToFile), 10 seconds)
+      result shouldBe Seq(FailedFileExportResult(apiName))
+    }
+  }
+
+  "generateOasFiles" should {
+    "return SuccessfulFileExportResult" in new Setup {
+      def absoluteCsvFilePath = Paths.get(".").toAbsolutePath().toString().replace(".", "") + "src/test/resources/test-api-definition-csv-export-with-single-record.csv"
+      val result = Await.result(RepoFileExport.generateOasFiles(absoluteCsvFilePath, Some(absoluteRamlFilePath), mockWriteToFile), 10 seconds)
+      result shouldBe Seq(SuccessfulFileExportResult("address-lookup"))
     }
   }
 

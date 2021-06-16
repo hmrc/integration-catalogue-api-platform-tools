@@ -1,0 +1,2 @@
+_id.serviceName;_id.name;versions;type.0
+address-lookup;Address Verification;1.0;PRIVATE;public/api/conf

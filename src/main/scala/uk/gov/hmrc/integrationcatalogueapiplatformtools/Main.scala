@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 import scala.util.{Failure, Success}
 // $COVERAGE-OFF$
-object Main extends App {
+object Main extends App with FileWriterUtils {
 
   lazy val logger = Logger(LoggerFactory.getLogger("mainLogger"))
 
@@ -34,7 +34,7 @@ object Main extends App {
       val linesForBashScript = GenerateGitCloneBashScript.printScript(csvRecords)
       println(linesForBashScript)
     case "--generateOas" :: Nil => {
-      val result = RepoFileExport.generateOasFiles("api-definition-csv-export.csv", None)
+      val result = RepoFileExport.generateOasFiles("api-definition-csv-export.csv", None, writeToFile)
       result.onComplete {
         case Success(value) => printResults(value)
         case Failure(e) => logger.error("failed!!", e)

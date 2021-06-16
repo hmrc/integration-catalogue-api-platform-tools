@@ -12,7 +12,6 @@ trait WebApiHandler {
 
   // $COVERAGE-OFF$
   def parseRamlFromFileName(fileName: String): Future[WebApiDocument] = {
-    println(s"*** fileName: $fileName")
     FutureConverters.toScala(Raml10.parse(fileName)).map(x =>  x.asInstanceOf[WebApiDocument])
   }
  

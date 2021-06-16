@@ -12,6 +12,7 @@ import scala.util.control.NonFatal
 
 object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApiHandler {
 
+
   def csvRecordToRamlWebApiModelWithDescription(csvApiRecord: CsvApiRecord, overridedRamlPath: Option[String]): Future[WebApiDocument] = {
     val filePath = overridedRamlPath.getOrElse(getFileNameForCsvRecord(csvApiRecord))
     parseRamlFromFileName(filePath)
@@ -21,40 +22,30 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
       })
   }
 
-  def generateOasFiles(csvFilePath: String,  overridedRamlPath: Option[String]): Future[Seq[FileExportResult]] = {
+  def generateOasFiles(csvFilePath: String,  overridedRamlPath: Option[String], f : (String, String) => Unit): Future[Seq[FileExportResult]] = {
     val eventualOasResults: Future[Seq[ConvertedWebApiToOasResult]] = Future.sequence(CsvUtils.csvApisToProcess(csvFilePath)
       .map(record => {
-
         for {
           model <- csvRecordToRamlWebApiModelWithDescription(record, overridedRamlPath)
           convertedOasResult <- parseOasFromWebApiModel(model, record.name)
         } yield convertedOasResult
-      })).recover {
-      case NonFatal(e) => e.printStackTrace()
-        throw e
-    }
+      }))
 
-    eventualOasResults
+      processOasStrings(eventualOasResults, f)
+   
+
+  }
+
+  def processOasStrings(eventualOasResults: Future[Seq[ConvertedWebApiToOasResult]], f : (String, String) => Unit): Future[Seq[FileExportResult]] = {
+     eventualOasResults
       .map(results => {
         results.map(convertedWebApiToOasResult => {
           addOasSpecAttributes(convertedWebApiToOasResult) match {
-            case Some(openApiAsString) => writeToFile(s"generated/${convertedWebApiToOasResult.apiName}.yaml", openApiAsString)
+            case Some(openApiAsString) =>f.apply(s"generated/${convertedWebApiToOasResult.apiName}.yaml", openApiAsString)
               SuccessfulFileExportResult(convertedWebApiToOasResult.apiName)
             case None                  => FailedFileExportResult(convertedWebApiToOasResult.apiName)
           }
         })
       })
-
   }
-
-  // $COVERAGE-OFF$
-  private def writeToFile(filename: String, content: String): Unit = {
-    import java.io.{BufferedWriter, File, FileWriter}
-
-    val file = new File(filename)
-    val bw = new BufferedWriter(new FileWriter(file))
-    bw.write(content)
-    bw.close()
-  }
-  // $COVERAGE-ON$
 }
