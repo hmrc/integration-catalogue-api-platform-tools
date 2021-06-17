@@ -39,7 +39,7 @@ class OpenApiEnhancementsSpec extends AnyWordSpec with Matchers with OpenApiEnha
 
         }
 
-        "add integration catalogue extensions to expected yaml file" in new Setup {
+        "add integration catalogue extensions to expected yaml file when description doesn't need to be truncated" in new Setup {
           val contentsToParse = getFileContents("noIntCatExtensions.yaml")
           val expectedYaml = getFileContents("expectedWithIntCatExtensions.yaml")
            addOasSpecAttributes(ConvertedWebApiToOasResult(contentsToParse, "iamAnApi")) shouldBe Some(expectedYaml)

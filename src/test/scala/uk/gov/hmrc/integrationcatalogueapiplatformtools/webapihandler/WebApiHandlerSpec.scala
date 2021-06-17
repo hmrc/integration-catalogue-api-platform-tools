@@ -39,6 +39,7 @@ class WebApiHandlerSpec extends AnyWordSpec with Matchers with WebApiHandler {
     val csvApiRecordPublicAccess = CsvApiRecord("public-apiname", "1.0", Public(), None)
     val csvApiRecordPrivateAccess = CsvApiRecord("private-apiname", "1.0", Private(), None)
     def webApiDocumentWithDescription = getWebApiDocument("test-ramlFile-with-description.raml")
+    def webApiDocumentWithLongDescription = getWebApiDocument("test-ramlFile-with-long-description.raml")
     def webApiDocumentWithEmptyDescription = getWebApiDocument("test-ramlFile-with-empty-description.raml")
     def webApiDocumentWithoutDescription = getWebApiDocument("test-ramlFile-without-description.raml")
   }
@@ -93,6 +94,16 @@ class WebApiHandlerSpec extends AnyWordSpec with Matchers with WebApiHandler {
       val expectedWebApi: WebApi =       webApiDocumentWithDescription.encodes.asInstanceOf[WebApi]
       expectedWebApi.withDescription("A description. This is a private API.")
       val resultingWebApi: WebApi = addAccessTypeToDescription(webApiDocumentWithDescription, csvApiRecordPrivateAccess)
+      resultingWebApi.description.value shouldBe expectedWebApi.description.value
+    }
+
+    "return webapi with private truncated description when csvapirecord has private access and webapidocument has a long description" in new Setup {
+
+      val expectedWebApi: WebApi =       webApiDocumentWithLongDescription.encodes.asInstanceOf[WebApi]
+      expectedWebApi.withDescription("This is a description longer than the maximum allowed which is one hundred and eighty characters. This should be truncated by the api-platform-tools so th... This is a private API.")
+      val resultingWebApi: WebApi = addAccessTypeToDescription(webApiDocumentWithLongDescription, csvApiRecordPrivateAccess)
+      println(s"**** expected description:${resultingWebApi.description.value}")
+      println(s"**** expected description length:${resultingWebApi.description.value.length}")
       resultingWebApi.description.value shouldBe expectedWebApi.description.value
     }
   }

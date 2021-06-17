@@ -28,9 +28,9 @@ trait WebApiHandler {
 
   // $COVERAGE-OFF$
   def parseRamlFromFileName(fileName: String): Future[WebApiDocument] = {
-    FutureConverters.toScala(Raml10.parse(fileName)).map(x =>  x.asInstanceOf[WebApiDocument])
+    FutureConverters.toScala(Raml10.parse(fileName)).map(x => x.asInstanceOf[WebApiDocument])
   }
- 
+
   def parseOasFromWebApiModel(model: WebApiDocument, apiName: String): Future[ConvertedWebApiToOasResult] = {
     FutureConverters.toScala(Oas30.generateYamlString(model)).map(oasAsString => ConvertedWebApiToOasResult(oasAsString, apiName))
   }
@@ -50,17 +50,16 @@ trait WebApiHandler {
       case None                       => webApi.withDescription(accessTypeDescription)
       case Some(x) if x.isNullOrEmpty => webApi.withDescription(accessTypeDescription)
       case Some(_)                    => {
-           if ((webApi.description.value + accessTypeDescription).length >180){
-            //handle truncating
-            val accessTypeDescriptionLength = accessTypeDescription.length
-            val characterOverLimit = (webApi.description.value.length  - (accessTypeDescriptionLength+4)) - 180
-             val truncatedDescription = webApi.description.value.substring(0, characterOverLimit)
-             // get description 
-              webApi.withDescription(truncatedDescription + s"... $accessTypeDescription")
+        if ((webApi.description.value + s" $accessTypeDescription").length > 180) {
+          val accessTypeDescriptionLength = accessTypeDescription.length
+          val characterOverLimit = (180 - (accessTypeDescriptionLength + 4))
+          val truncatedDescription = webApi.description.value.substring(0, characterOverLimit)
 
-            }else{
-               webApi.withDescription(webApi.description + s" $accessTypeDescription")
-            }
+          webApi.withDescription(truncatedDescription + s"... $accessTypeDescription")
+
+        } else {
+          webApi.withDescription(webApi.description + s" $accessTypeDescription")
+        }
 
       }
     }
