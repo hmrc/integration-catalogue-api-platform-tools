@@ -44,11 +44,25 @@ trait WebApiHandler {
       case Public()  => "This is a public API."
       case Private() => "This is a private API."
     }
+    // description truncated at 180 chars - (accessTypeDescription.length + "...".length)
 
     Option(webApi.description) match {
       case None                       => webApi.withDescription(accessTypeDescription)
       case Some(x) if x.isNullOrEmpty => webApi.withDescription(accessTypeDescription)
-      case Some(_)                    => webApi.withDescription(webApi.description + s" $accessTypeDescription")
+      case Some(_)                    => {
+           if ((webApi.description.value + accessTypeDescription).length >180){
+            //handle truncating
+            val accessTypeDescriptionLength = accessTypeDescription.length
+            val characterOverLimit = (webApi.description.value.length  - (accessTypeDescriptionLength+4)) - 180
+             val truncatedDescription = webApi.description.value.substring(0, characterOverLimit)
+             // get description 
+              webApi.withDescription(truncatedDescription + s"... $accessTypeDescription")
+
+            }else{
+               webApi.withDescription(webApi.description + s" $accessTypeDescription")
+            }
+
+      }
     }
   }
 

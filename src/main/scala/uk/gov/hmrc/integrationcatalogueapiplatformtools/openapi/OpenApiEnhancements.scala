@@ -26,13 +26,13 @@ import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos.RepoFileExport.{EX
 import java.util
 import scala.util.{Failure, Success, Try}
 
-trait OpenApiEnhancements {
+trait OpenApiEnhancements extends ExtensionKeys {
 
   def addOasSpecAttributes(convertedOasResult: ConvertedWebApiToOasResult): Option[String] = {
     val options: ParseOptions = new ParseOptions()
     options.setResolve(false)
-     Option(new OpenAPIV3Parser().readContents(convertedOasResult.oasAsString, null, options))
-     .flatMap(swaggerParseResult => Option(swaggerParseResult.getOpenAPI))
+    Option(new OpenAPIV3Parser().readContents(convertedOasResult.oasAsString, null, options))
+      .flatMap(swaggerParseResult => Option(swaggerParseResult.getOpenAPI))
       .map(addExtensions(_, convertedOasResult.apiName)
         .map(openApiToContent).getOrElse(""))
   }
@@ -40,8 +40,15 @@ trait OpenApiEnhancements {
   private def addExtensions(openApi: OpenAPI, apiName: String): Option[OpenAPI] = {
     val subLevelExtensions = new util.HashMap[String, AnyRef]()
 
+    Option(openApi.getInfo())
+      .map(info => {
+        Option(info.getDescription()).map(description => {
+        subLevelExtensions.put(SHORT_DESC_EXTENSION_KEY, description)})
+      })
+
     subLevelExtensions.put(PLATFORM_EXTENSION_KEY, "API_PLATFORM")
     subLevelExtensions.put(PUBLISHER_REF_EXTENSION_KEY, apiName)
+    
 
     val topLevelExtensionsMap = new util.HashMap[String, AnyRef]()
     topLevelExtensionsMap.put(EXTENSIONS_KEY, subLevelExtensions)

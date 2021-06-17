@@ -4,6 +4,7 @@ info:
   description: This is a private API.
   version: "1.0"
   x-integration-catalogue:
+    short-description: This is a private API.
     platform: API_PLATFORM
     publisher-reference: iamAnApi
 externalDocs:
