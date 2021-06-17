@@ -38,11 +38,13 @@ This uses this library for parsing RAML and converting to OAS 3: [webapi-parser]
 1. Diff and re-add any raml override paths in the CSV.
 1. Generate the git clone command
     ```
-    sbt 'run --generateGitClone' > api-repos/clone-apis.sh
+    sbt 'run --generateGitClone' > scripts/clone-apis.sh
     ```
 1. Tidy up the 'clone-apis.sh' bash script. e.g. delete all the sbt log messages at the top, and add this as the fist line.
     ```
     #!/usr/bin/env bash
+   
+   cd ../api-repos
     ```
     
 1. Run the 'clone-apis.sh' from the 'api-repos' directory (this will take a few minutes to run!)
