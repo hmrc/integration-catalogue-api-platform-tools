@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler
 
-import amf.client.model.domain.WebApi
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{ConvertedWebApiToOasResult, CsvApiRecord, Private, Public}
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{AccessType, ConvertedWebApiToOasResult, CsvApiRecord, Private, Public}
 import webapi.{Oas30, Raml10, WebApiDocument}
 
 import scala.compat.java8._
@@ -31,37 +30,16 @@ trait WebApiHandler {
     FutureConverters.toScala(Raml10.parse(fileName)).map(x => x.asInstanceOf[WebApiDocument])
   }
 
-  def parseOasFromWebApiModel(model: WebApiDocument, apiName: String): Future[ConvertedWebApiToOasResult] = {
-    FutureConverters.toScala(Oas30.generateYamlString(model)).map(oasAsString => ConvertedWebApiToOasResult(oasAsString, apiName))
+  def parseOasFromWebApiModel(model: WebApiDocument, apiName: String, accessType: AccessType): Future[ConvertedWebApiToOasResult] = {
+    FutureConverters.toScala(Oas30.generateYamlString(model))
+      .map(oasAsString => ConvertedWebApiToOasResult(oasAsString, apiName, accessTypeDescription(accessType)))
   }
   // $COVERAGE-ON$
 
-  def addAccessTypeToDescription(model: WebApiDocument, api: CsvApiRecord): WebApi = {
-
-    val webApi: WebApi = model.encodes.asInstanceOf[WebApi]
-
-    val accessTypeDescription = api.accessType match {
+  def accessTypeDescription(accessType : AccessType) : String = {
+    accessType match {
       case Public()  => "This is a public API."
       case Private() => "This is a private API."
-    }
-    // description truncated at 180 chars - (accessTypeDescription.length + "...".length)
-
-    Option(webApi.description) match {
-      case None                       => webApi.withDescription(accessTypeDescription)
-      case Some(x) if x.isNullOrEmpty => webApi.withDescription(accessTypeDescription)
-      case Some(_)                    => {
-        if ((webApi.description.value + s" $accessTypeDescription").length > 180) {
-          val accessTypeDescriptionLength = accessTypeDescription.length
-          val characterOverLimit = (180 - (accessTypeDescriptionLength + 4))
-          val truncatedDescription = webApi.description.value.substring(0, characterOverLimit)
-
-          webApi.withDescription(truncatedDescription + s"... $accessTypeDescription")
-
-        } else {
-          webApi.withDescription(webApi.description + s" $accessTypeDescription")
-        }
-
-      }
     }
   }
 

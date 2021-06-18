@@ -32,10 +32,7 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
   def csvRecordToRamlWebApiModelWithDescription(csvApiRecord: CsvApiRecord, overridedRamlPath: Option[String]): Future[WebApiDocument] = {
     val filePath = overridedRamlPath.getOrElse(getFileNameForCsvRecord(csvApiRecord))
     parseRamlFromFileName(filePath)
-      .map(model => {
-        addAccessTypeToDescription(model, csvApiRecord)
-        model
-      })
+
   }
 
   def generateOasFiles(csvFilePath: String,  overridedRamlPath: Option[String], f : (String, String) => Unit): Future[Seq[FileExportResult]] = {
@@ -43,7 +40,7 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
       .map(record => {
         for {
           model <- csvRecordToRamlWebApiModelWithDescription(record, overridedRamlPath)
-          convertedOasResult <- parseOasFromWebApiModel(model, record.name)
+          convertedOasResult <- parseOasFromWebApiModel(model, record.name, record.accessType)
         } yield convertedOasResult
       }))
 

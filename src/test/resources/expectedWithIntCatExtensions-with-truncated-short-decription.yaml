@@ -1,10 +1,14 @@
 openapi: 3.0.0
 info:
   title: Address Verification
-  description: A description.
+  description: "This is a description longer than the maximum allowed which is one\
+    \ hundred and eighty characters. This should be truncated by the api-platform-tools\
+    \ so that the yaml file has the truncated version of this description."
   version: "1.0"
   x-integration-catalogue:
-    short-description: A description.
+    short-description: "This is a description longer than the maximum allowed which\
+      \ is one hundred and eighty characters. This should be truncated by the api-platform-tools\
+      \ so that the yaml file has th..."
     platform: API_PLATFORM
     publisher-reference: iamAnApi
 externalDocs:

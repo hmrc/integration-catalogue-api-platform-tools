@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Address Verification
-  description: This is a private API.
+  description: A description.
   version: "1.0"
 externalDocs:
   description: "This API enables your application to lookup the full address for a\

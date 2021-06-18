@@ -16,12 +16,14 @@
 
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi
 
+import amf.client.model.domain.WebApi
 import io.swagger.v3.core.util.Yaml
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.{ParseOptions, SwaggerParseResult}
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.ConvertedWebApiToOasResult
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{ConvertedWebApiToOasResult, CsvApiRecord, Private, Public}
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos.RepoFileExport.{EXTENSIONS_KEY, PLATFORM_EXTENSION_KEY, PUBLISHER_REF_EXTENSION_KEY}
+import webapi.WebApiDocument
 
 import java.util
 import scala.util.{Failure, Success, Try}
@@ -33,22 +35,40 @@ trait OpenApiEnhancements extends ExtensionKeys {
     options.setResolve(false)
     Option(new OpenAPIV3Parser().readContents(convertedOasResult.oasAsString, null, options))
       .flatMap(swaggerParseResult => Option(swaggerParseResult.getOpenAPI))
-      .map(addExtensions(_, convertedOasResult.apiName)
-        .map(openApiToContent).getOrElse(""))
+      .flatMap(addExtensions(_, convertedOasResult.apiName)
+      .map(addAccessTypeToDescription(_, convertedOasResult.accessTypeDescription)
+        .map(openApiToContent).getOrElse("")))
   }
+
+  private def addAccessTypeToDescription(openApi: OpenAPI, accessTypeDescription: String): Option[OpenAPI] = {
+
+    Option(openApi.getInfo).map(info => {
+      Option(info.getDescription) match {
+        case None                       => info.setDescription(accessTypeDescription)
+        case Some(x) if x.isEmpty       => info.setDescription(accessTypeDescription)
+        case Some(_)                    => ()
+      }
+      openApi.setInfo(info)
+      openApi
+    })
+
+  }
+
+  
 
   private def addExtensions(openApi: OpenAPI, apiName: String): Option[OpenAPI] = {
     val subLevelExtensions = new util.HashMap[String, AnyRef]()
 
     Option(openApi.getInfo())
       .map(info => {
-        Option(info.getDescription()).map(description => {
-        subLevelExtensions.put(SHORT_DESC_EXTENSION_KEY, description)})
-      })
 
-    subLevelExtensions.put(PLATFORM_EXTENSION_KEY, "API_PLATFORM")
-    subLevelExtensions.put(PUBLISHER_REF_EXTENSION_KEY, apiName)
-    
+        subLevelExtensions.put(PLATFORM_EXTENSION_KEY, "API_PLATFORM")
+        subLevelExtensions.put(PUBLISHER_REF_EXTENSION_KEY, apiName)
+        
+        Option(info.getDescription()).map(description => {
+        subLevelExtensions.put(SHORT_DESC_EXTENSION_KEY, truncateShortDescription(description))})
+        
+      })
 
     val topLevelExtensionsMap = new util.HashMap[String, AnyRef]()
     topLevelExtensionsMap.put(EXTENSIONS_KEY, subLevelExtensions)
@@ -59,6 +79,11 @@ trait OpenApiEnhancements extends ExtensionKeys {
       openApi
     })
 
+  }
+
+  private def truncateShortDescription(description: String) : String = {
+    if (description.length > 180) description.substring(0, (180 - 3)) + "..."
+    else description
   }
 
   private def openApiToContent(openApi: OpenAPI): String = {
