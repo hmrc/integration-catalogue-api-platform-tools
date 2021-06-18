@@ -81,8 +81,8 @@ class OpenApiEnhancementsSpec extends AnyWordSpec with Matchers with OpenApiEnha
     }
 
     "add accessType description to expected yaml file when description does not exist" in new Setup {
-      val contentsToParse = getFileContents("noIntCatExtensions-with-long-description.yaml")
-      val expectedYaml = getFileContents("expectedWithIntCatExtensions-with-truncated-short-decription.yaml")
+      val contentsToParse = getFileContents("noIntCatExtensions-no-description.yaml")
+      val expectedYaml = getFileContents("expectedWithIntCatExtensions-with-accessType-description.yaml")
       val expectedShortDesc = getShortDescriptionFromOasString(expectedYaml).getOrElse("")
       val expectedDescription = getDescriptionFromOasString(expectedYaml).getOrElse("")
       val result: Option[String] = addOasSpecAttributes(ConvertedWebApiToOasResult(contentsToParse, "iamAnApi", "This is a private API."))
@@ -93,6 +93,22 @@ class OpenApiEnhancementsSpec extends AnyWordSpec with Matchers with OpenApiEnha
 
       resultingShortDesc shouldBe expectedShortDesc
       resultingDescription shouldBe expectedDescription
+    }
+
+    "add accessType description to expected yaml file when description is empty" in new Setup {
+      val contentsToParse = getFileContents("noIntCatExtensions-empty-description.yaml")
+      val expectedYaml = getFileContents("expectedWithIntCatExtensions-with-accessType-description.yaml")
+      val expectedShortDesc = getShortDescriptionFromOasString(expectedYaml).getOrElse("")
+      val expectedDescription = getDescriptionFromOasString(expectedYaml).getOrElse("")
+      val result: Option[String] = addOasSpecAttributes(ConvertedWebApiToOasResult(contentsToParse, "iamAnApi", "This is a private API."))
+      result.isDefined shouldBe true
+      
+      val resultingShortDesc = getShortDescriptionFromOasString(result.getOrElse("")).getOrElse("")
+      val resultingDescription = getDescriptionFromOasString(result.getOrElse("")).getOrElse("")
+
+      resultingDescription shouldBe expectedDescription
+      resultingShortDesc shouldBe expectedShortDesc
+      
     }
   }
 }
