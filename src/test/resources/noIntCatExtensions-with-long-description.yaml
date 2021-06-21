@@ -1,12 +1,10 @@
 openapi: 3.0.0
 info:
   title: Address Verification
-  description: A description.
+  description: "This is a description longer than the maximum allowed which is one\
+    \ hundred and eighty characters. This should be truncated by the api-platform-tools\
+    \ so that the yaml file has the truncated version of this description."
   version: "1.0"
-  x-integration-catalogue:
-    short-description: A description.
-    platform: API_PLATFORM
-    publisher-reference: iamAnApi
 externalDocs:
   description: "This API enables your application to lookup the full address for a\
     \ UK postcode.\nThe results can be narrowed down by providing an optional filter,\

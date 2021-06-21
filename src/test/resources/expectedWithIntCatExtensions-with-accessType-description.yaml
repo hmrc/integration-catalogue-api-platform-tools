@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
   title: Address Verification
-  description: A description.
+  description: This is a private API.
   version: "1.0"
   x-integration-catalogue:
-    short-description: A description.
+    short-description: This is a private API.
     platform: API_PLATFORM
     publisher-reference: iamAnApi
 externalDocs:

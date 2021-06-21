@@ -38,7 +38,7 @@ object AccessType {
 
 case class CsvApiRecord(name: String, version: String, accessType: AccessType, ramlPathOverride: Option[String])
 
-case class ConvertedWebApiToOasResult(oasAsString: String, apiName: String)
+case class ConvertedWebApiToOasResult(oasAsString: String, apiName: String, accessTypeDescription: String)
 
 
 sealed trait FileExportResult

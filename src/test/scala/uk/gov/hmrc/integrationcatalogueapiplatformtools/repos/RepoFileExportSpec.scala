@@ -58,7 +58,7 @@ class RepoFileExportSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   "csvRecordToRamlWebApiModelWithDescription" should {
     "return webapidocument when filepath is a raml file" in new Setup {
-      val expectedDescription = "A description. This is a public API."
+      val expectedDescription = "A description."
       val result = Await.result(RepoFileExport.csvRecordToRamlWebApiModelWithDescription(csvApiRecordPublicAccess, Some(absoluteRamlFilePath)), 10 seconds)
 
       result.encodes.asInstanceOf[WebApi].description.value shouldBe expectedDescription
@@ -70,7 +70,7 @@ class RepoFileExportSpec extends AnyWordSpec with Matchers with MockitoSugar {
     "return SuccessfulFileExportResult" in new Setup {
       val apiName = "Api Name"
       val oasString = Source.fromResource("noIntCatExtensions.yaml").mkString
-      val oasStrings = Future.successful(Seq(ConvertedWebApiToOasResult(oasString, apiName)))
+      val oasStrings = Future.successful(Seq(ConvertedWebApiToOasResult(oasString, apiName, "This is a private API.")))
       val result = Await.result(RepoFileExport.processOasStrings(oasStrings, mockWriteToFile), 10 seconds)
       result shouldBe Seq(SuccessfulFileExportResult(apiName))
     }
@@ -78,7 +78,7 @@ class RepoFileExportSpec extends AnyWordSpec with Matchers with MockitoSugar {
     "return FailedFileExportResult" in new Setup {
       val apiName = "Api Name"
       val oasString = ""
-      val oasStrings = Future.successful(Seq(ConvertedWebApiToOasResult(oasString, apiName)))
+      val oasStrings = Future.successful(Seq(ConvertedWebApiToOasResult(oasString, apiName, "This is a private API.")))
       val result = Await.result(RepoFileExport.processOasStrings(oasStrings, mockWriteToFile), 10 seconds)
       result shouldBe Seq(FailedFileExportResult(apiName))
     }

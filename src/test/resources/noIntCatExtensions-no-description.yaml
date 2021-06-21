@@ -1,12 +1,7 @@
 openapi: 3.0.0
 info:
   title: Address Verification
-  description: A description.
   version: "1.0"
-  x-integration-catalogue:
-    short-description: A description.
-    platform: API_PLATFORM
-    publisher-reference: iamAnApi
 externalDocs:
   description: "This API enables your application to lookup the full address for a\
     \ UK postcode.\nThe results can be narrowed down by providing an optional filter,\

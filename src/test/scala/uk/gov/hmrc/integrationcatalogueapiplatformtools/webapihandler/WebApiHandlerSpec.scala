@@ -39,6 +39,7 @@ class WebApiHandlerSpec extends AnyWordSpec with Matchers with WebApiHandler {
     val csvApiRecordPublicAccess = CsvApiRecord("public-apiname", "1.0", Public(), None)
     val csvApiRecordPrivateAccess = CsvApiRecord("private-apiname", "1.0", Private(), None)
     def webApiDocumentWithDescription = getWebApiDocument("test-ramlFile-with-description.raml")
+    def webApiDocumentWithLongDescription = getWebApiDocument("test-ramlFile-with-long-description.raml")
     def webApiDocumentWithEmptyDescription = getWebApiDocument("test-ramlFile-with-empty-description.raml")
     def webApiDocumentWithoutDescription = getWebApiDocument("test-ramlFile-without-description.raml")
   }
@@ -61,39 +62,15 @@ class WebApiHandlerSpec extends AnyWordSpec with Matchers with WebApiHandler {
     }
   }
 
-  "addAccessTypeToDescription" should {
+  "accessTypeDescription" should {
+    "return 'This is a public API.' when accessType is Public() " in {
+      accessTypeDescription(Public()) shouldBe "This is a public API."
 
-    "return webapi with public description when csvapirecord has public access and webapidocument has no description" in new Setup {
-
-      val expectedWebApi: WebApi = webApiDocumentWithoutDescription.encodes.asInstanceOf[WebApi]
-      expectedWebApi.withDescription("This is a public API.")
-
-      val resultingWebApi: WebApi = addAccessTypeToDescription(webApiDocumentWithoutDescription, csvApiRecordPublicAccess)
-      resultingWebApi.description.value shouldBe expectedWebApi.description.value
     }
 
-    "return webapi with private description when csvapirecord has private access and webapidocument has no description" in new Setup {
+    "return 'This is a private API.' when accessType is Private() " in {
+      accessTypeDescription(Private()) shouldBe "This is a private API."
 
-      val expectedWebApi: WebApi = webApiDocumentWithoutDescription.encodes.asInstanceOf[WebApi]
-      expectedWebApi.withDescription("This is a private API.")
-      val resultingWebApi: WebApi = addAccessTypeToDescription(webApiDocumentWithoutDescription, csvApiRecordPrivateAccess)
-      resultingWebApi.description.value shouldBe expectedWebApi.description.value
-    }
-
-    "return webapi with private description when csvapirecord has private access and webapidocument has an empty description" in new Setup {
-
-      val expectedWebApi: WebApi =       webApiDocumentWithEmptyDescription.encodes.asInstanceOf[WebApi]
-      expectedWebApi.withDescription("This is a private API.")
-      val resultingWebApi: WebApi = addAccessTypeToDescription(webApiDocumentWithEmptyDescription, csvApiRecordPrivateAccess)
-      resultingWebApi.description.value shouldBe expectedWebApi.description.value
-    }
-
-    "return webapi with private description when csvapirecord has private access and webapidocument has a description" in new Setup {
-
-      val expectedWebApi: WebApi =       webApiDocumentWithDescription.encodes.asInstanceOf[WebApi]
-      expectedWebApi.withDescription("A description. This is a private API.")
-      val resultingWebApi: WebApi = addAccessTypeToDescription(webApiDocumentWithDescription, csvApiRecordPrivateAccess)
-      resultingWebApi.description.value shouldBe expectedWebApi.description.value
     }
   }
 
