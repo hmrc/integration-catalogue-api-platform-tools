@@ -80,7 +80,7 @@ class RepoFileExportSpec extends AnyWordSpec with Matchers with MockitoSugar {
       val oasString = ""
       val oasStrings = Future.successful(Seq(ConvertedWebApiToOasResult(oasString, apiName, "This is a private API.")))
       val result = Await.result(RepoFileExport.processOasStrings(oasStrings, mockWriteToFile), 10 seconds)
-      result shouldBe Seq(FailedFileExportResult(apiName))
+      result shouldBe Seq(FailedFileExportResult(apiName, "Swagger Parse failure"))
     }
   }
 

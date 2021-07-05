@@ -34,7 +34,7 @@ object Main extends App with FileWriterUtils with Logging {
   def printResults(results: Seq[FileExportResult]): Unit ={
     results.foreach(result => result match {
       case x: SuccessfulFileExportResult =>  ()
-      case y: FailedFileExportResult =>  logger.info(s"${y.apiName} failed to process")
+      case y: FailedFileExportResult =>  logger.info(s"${y.apiName} failed to process error message: ${y.message}")
     })
     logger.info(s"A total of ${results.size} processed")
     logger.info(s"${results.filter(x => x.isInstanceOf[SuccessfulFileExportResult]).size} successfully processed")

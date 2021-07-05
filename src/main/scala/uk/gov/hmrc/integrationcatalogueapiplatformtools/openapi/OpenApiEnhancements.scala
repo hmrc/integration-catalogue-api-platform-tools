@@ -25,55 +25,79 @@ import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.ConvertedWebApiToO
 
 import java.util
 import scala.collection.JavaConverters._
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.OpenApiProcessingError
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.GeneralOpenApiProcessingError
 
 trait OpenApiEnhancements extends ExtensionKeys with Logging {
 
-  def addOasSpecAttributes(convertedOasResult: ConvertedWebApiToOasResult): Option[String] = {
+  def addOasSpecAttributes(convertedOasResult: ConvertedWebApiToOasResult): Either[OpenApiProcessingError, String] = {
     val options: ParseOptions = new ParseOptions()
     options.setResolve(false)
-    Option(new OpenAPIV3Parser().readContents(convertedOasResult.oasAsString, null, options))
+    val maybeOpenApi = Option(new OpenAPIV3Parser().readContents(convertedOasResult.oasAsString, null, options))
       .flatMap(swaggerParseResult => Option(swaggerParseResult.getOpenAPI))
-      .map(x =>  logXamfUserDocumentationStatus(x, convertedOasResult.apiName))
-      .flatMap(addAccessTypeToDescription(_, convertedOasResult.accessTypeDescription)
-        .map(addExtensions(_, convertedOasResult.apiName)
-          .map(openApiToContent).getOrElse("")))
+
+    val validatedOpenApi = maybeOpenApi match {
+      case Some(openApi) => validateAmfOAS(openApi, convertedOasResult.apiName)
+      case None          => Left(GeneralOpenApiProcessingError(convertedOasResult.apiName, "Swagger Parse failure"))
+    }
+
+    validatedOpenApi match {
+      case Right(openAPI)                  => {
+        addAccessTypeToDescription(openAPI, convertedOasResult.accessTypeDescription)
+          .flatMap(addExtensions(_, convertedOasResult.apiName))
+          .map(x => Right(openApiToContent(x)))
+          .getOrElse(Left(GeneralOpenApiProcessingError(convertedOasResult.apiName, "Swagger Parse failure")))
+      }
+      case Left(e: OpenApiProcessingError) => Left(e)
+    }
   }
 
- private def logXamfUserDocumentationStatus(openApi: OpenAPI, apiName: String)={
-   val maybeOpenApi = Option(openApi)
-   val maybeExtensions = maybeOpenApi
-   .flatMap(openApi => Option(openApi.getExtensions()).flatMap(extensionsMap => Option(extensionsMap.get("x-amf-userDocumentation"))
-     .map(x => {
-       x.asInstanceOf[util.ArrayList[java.util.LinkedHashMap[String, Object]]]
-     })))
+  private def validateAmfOAS(openApi: OpenAPI, apiName: String): Either[OpenApiProcessingError, OpenAPI] = {
 
+    case class SubDocument(apiName: String, title: String, content: String)
 
-case class SubDocument(apiName: String, title:String , content: String)
+    def getExtensions(openApi: OpenAPI): Option[util.ArrayList[java.util.LinkedHashMap[String, Object]]] = {
+      Option(openApi.getExtensions()).flatMap(extensionsMap =>
+        Option(extensionsMap.get("x-amf-userDocumentation"))
+          .map(x => {
+            x.asInstanceOf[util.ArrayList[java.util.LinkedHashMap[String, Object]]]
+          })
+      )
+    }
 
-  val listOfsubDocuments: List[SubDocument] =  maybeExtensions
-    .map(xList => {
-      val convertedList = xList.asScala.toList
-       convertedList.map( x=> {
-         val maybeContent = Option(x.get("content"))
-         val mayBeTitle = Option(x.get("title"))
-         (mayBeTitle, maybeContent) match {
-           case (Some(title: String), Some(content: String)) => Some(SubDocument(apiName, title, content))
-           case _ => None
-         }
-       })
-    } ).getOrElse(List.empty).flatten
+    def extractDocumentation(extensionData: util.ArrayList[java.util.LinkedHashMap[String, Object]]) = {
+      val convertedList = extensionData.asScala.toList
+      convertedList.flatMap(x => {
+        val maybeContent = Option(x.get("content"))
+        val mayBeTitle = Option(x.get("title"))
+        (mayBeTitle, maybeContent) match {
+          case (Some(title: String), Some(content: String)) => Some(SubDocument(apiName, title, content))
+          case _ => None
+        }
+      })
+    }
 
-   val errorList: List[SubDocument] = listOfsubDocuments.filter(document => {
-     document.content.contains("https://developer.service.hmrc.gov.uk/api-documentation/assets/")})
+    def validateSubdocuments(subdocuments: List[SubDocument], openApi: OpenAPI) = {
+      val errorListAsStrings: List[String] = subdocuments.filter(document => {
+        document.content.contains("https://developer.service.hmrc.gov.uk/api-documentation/assets/")
+      })
+      .map(document => s"API: ${document.apiName} content for title: ${document.title} points to a file!! ${document.content} \n")
 
-  errorList.map(document => {
-     logger.error(s"API: ${document.apiName} content for title: ${document.title} points to a file!! ${document.content}")
-  })
+      if (errorListAsStrings.nonEmpty) {
+        Left(GeneralOpenApiProcessingError(apiName, errorListAsStrings.mkString))
+      } else Right(openApi)
 
-//list subdocuments group by document.apiName get title ... apiname -> list[String] titles
+    }
 
-   openApi
- }
+    val maybeUserDocumentationExtensions: Option[util.ArrayList[util.LinkedHashMap[String, AnyRef]]] =
+      Option(openApi).flatMap(getExtensions)
+
+    val listOfsubDocuments: List[SubDocument] =
+      maybeUserDocumentationExtensions.map(x => extractDocumentation(x)).getOrElse(List.empty)
+
+    validateSubdocuments(listOfsubDocuments, openApi)
+
+  }
 
   private def addAccessTypeToDescription(openApi: OpenAPI, accessTypeDescription: String): Option[OpenAPI] = {
 
