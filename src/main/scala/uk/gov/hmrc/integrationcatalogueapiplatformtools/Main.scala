@@ -17,8 +17,7 @@
 package uk.gov.hmrc.integrationcatalogueapiplatformtools
 
 
-import com.typesafe.scalalogging.Logger
-import org.slf4j.LoggerFactory
+
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos._
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.csv.CsvUtils
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{FailedFileExportResult, FileExportResult, SuccessfulFileExportResult}
@@ -28,9 +27,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 import scala.util.{Failure, Success}
 // $COVERAGE-OFF$
-object Main extends App with FileWriterUtils {
+object Main extends App with FileWriterUtils with Logging {
 
-  lazy val logger = Logger(LoggerFactory.getLogger("mainLogger"))
+
 
   def printResults(results: Seq[FileExportResult]): Unit ={
     results.foreach(result => result match {
