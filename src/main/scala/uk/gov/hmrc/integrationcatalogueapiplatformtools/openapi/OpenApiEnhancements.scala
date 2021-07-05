@@ -47,22 +47,30 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging {
        x.asInstanceOf[util.ArrayList[java.util.LinkedHashMap[String, Object]]]
      })))
 
-  val listOfmaybeContentAsString: List[String] =  maybeExtensions
+
+case class SubDocument(apiName: String, title:String , content: String)
+
+  val listOfsubDocuments: List[SubDocument] =  maybeExtensions
     .map(xList => {
       val convertedList = xList.asScala.toList
        convertedList.map( x=> {
-         Option(x.asScala.get("content"))
-       }).map(_.toString)
-    } ).getOrElse(List.empty)
+         val maybeContent = Option(x.get("content"))
+         val mayBeTitle = Option(x.get("title"))
+         (mayBeTitle, maybeContent) match {
+           case (Some(title: String), Some(content: String)) => Some(SubDocument(apiName, title, content))
+           case _ => None
+         }
+       })
+    } ).getOrElse(List.empty).flatten
 
-   listOfmaybeContentAsString.map(content => {
+   val errorList: List[SubDocument] = listOfsubDocuments.filter(document => {
+     document.content.contains("https://developer.service.hmrc.gov.uk/api-documentation/assets/")})
 
-       if(content.contains("https://developer.service.hmrc.gov.uk/api-documentation/assets/")){
-         logger.error(s"API: $apiName content points to file")
-       }else{
-         logger.info(s"API: $apiName content is fine")
-       }
+  errorList.map(document => {
+     logger.error(s"API: ${document.apiName} content for title: ${document.title} points to a file!! ${document.content}")
   })
+
+//list subdocuments group by document.apiName get title ... apiname -> list[String] titles
 
    openApi
  }
