@@ -29,12 +29,12 @@ trait WebApiHandler {
   // $COVERAGE-OFF$
   def parseRamlFromFileName(fileName: String): Future[WebApiDocument] = {
     FutureConverters.toScala({
-      //TimeUnit.MILLISECONDS.sleep(250)
+     TimeUnit.MILLISECONDS.sleep(250)
       Raml10.parse(fileName)}).map(x => x.asInstanceOf[WebApiDocument])
   }
   def parseOasFromWebApiModel(model: WebApiDocument, apiName: String, accessType: AccessType): Future[ConvertedWebApiToOasResult] = {
     FutureConverters.toScala({
-     // TimeUnit.MILLISECONDS.sleep(250)
+      TimeUnit.MILLISECONDS.sleep(250)
       Oas30.generateYamlString(model)
     }).map(oasAsString => ConvertedWebApiToOasResult(oasAsString, apiName, accessTypeDescription(accessType)))
   }

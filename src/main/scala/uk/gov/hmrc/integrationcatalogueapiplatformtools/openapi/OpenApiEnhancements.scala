@@ -16,19 +16,15 @@
 
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi
 
-import amf.client.model.domain.WebApi
 import io.swagger.v3.core.util.Yaml
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.OpenAPIV3Parser
-import io.swagger.v3.parser.core.models.{ParseOptions, SwaggerParseResult}
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{ConvertedWebApiToOasResult, CsvApiRecord, Private, Public}
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.repos.RepoFileExport.{EXTENSIONS_KEY, PLATFORM_EXTENSION_KEY, PUBLISHER_REF_EXTENSION_KEY}
+import io.swagger.v3.parser.core.models.ParseOptions
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.Logging
-
-import webapi.WebApiDocument
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.ConvertedWebApiToOasResult
 
 import java.util
-import scala.util.{Failure, Success, Try}
+import scala.collection.JavaConverters._
 
 trait OpenApiEnhancements extends ExtensionKeys with Logging {
 
@@ -37,23 +33,35 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging {
     options.setResolve(false)
     Option(new OpenAPIV3Parser().readContents(convertedOasResult.oasAsString, null, options))
       .flatMap(swaggerParseResult => Option(swaggerParseResult.getOpenAPI))
-      .map(logXamfUserDocumentationStatus)
+      .map(x =>  logXamfUserDocumentationStatus(x, convertedOasResult.apiName))
       .flatMap(addAccessTypeToDescription(_, convertedOasResult.accessTypeDescription)
         .map(addExtensions(_, convertedOasResult.apiName)
           .map(openApiToContent).getOrElse("")))
   }
 
- private def logXamfUserDocumentationStatus(openApi: OpenAPI)={
+ private def logXamfUserDocumentationStatus(openApi: OpenAPI, apiName: String)={
    val maybeOpenApi = Option(openApi)
    val maybeExtensions = maybeOpenApi
-   .flatMap(openApi => Option(openApi.getExtensions()).flatMap(extensionsMap => Option(extensionsMap.get("x-amf-userDocumentation")).map(_.asInstanceOf[util.Map[String, Object]])))
+   .flatMap(openApi => Option(openApi.getExtensions()).flatMap(extensionsMap => Option(extensionsMap.get("x-amf-userDocumentation"))
+     .map(x => {
+       x.asInstanceOf[util.ArrayList[java.util.LinkedHashMap[String, Object]]]
+     })))
 
-  val maybeContentAsString =  maybeExtensions.flatMap(xMap => Option(xMap.get("content")).map(_.asInstanceOf[String]) )
-  maybeContentAsString.map(content => {
-    if(content.contains("https://developer.service.hmrc.gov.uk/api-documentation/assets/")){
-        val apiName = maybeOpenApi.flatMap(x => Option(x.getInfo()).flatMap(x => Option(x.getTitle()))).getOrElse("UNABLE TO GET API NAME")
-        logger.error(s"API: $apiName content points to file")
-    } 
+  val listOfmaybeContentAsString: List[String] =  maybeExtensions
+    .map(xList => {
+      val convertedList = xList.asScala.toList
+       convertedList.map( x=> {
+         Option(x.asScala.get("content"))
+       }).map(_.toString)
+    } ).getOrElse(List.empty)
+
+   listOfmaybeContentAsString.map(content => {
+
+       if(content.contains("https://developer.service.hmrc.gov.uk/api-documentation/assets/")){
+         logger.error(s"API: $apiName content points to file")
+       }else{
+         logger.info(s"API: $apiName content is fine")
+       }
   })
 
    openApi
