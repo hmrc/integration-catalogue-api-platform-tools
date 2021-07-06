@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler
 
-import amf.client.model.domain.WebApi
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._

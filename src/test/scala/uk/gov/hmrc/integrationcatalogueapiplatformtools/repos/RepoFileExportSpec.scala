@@ -16,24 +16,18 @@
 
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.repos
 
+import amf.client.model.domain.WebApi
 import org.mockito.scalatest.MockitoSugar
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{CsvApiRecord, Private, Public}
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi.OpenApiEnhancements
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler.WebApiHandler
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
 import webapi.{Raml10, WebApiDocument}
 
-import java.util.concurrent.TimeUnit
-import scala.io.Source
-import scala.concurrent.{duration, Await}
-import scala.concurrent.duration._
-import scala.concurrent.Future
 import java.nio.file.Paths
-import amf.client.model.domain.WebApi
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.ConvertedWebApiToOasResult
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.SuccessfulFileExportResult
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.FailedFileExportResult
+import java.util.concurrent.TimeUnit
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+import scala.io.Source
 
 class RepoFileExportSpec extends AnyWordSpec with Matchers with MockitoSugar {
 

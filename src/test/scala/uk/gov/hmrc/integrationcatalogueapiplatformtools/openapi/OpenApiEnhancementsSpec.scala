@@ -16,16 +16,13 @@
 
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi
 
+import io.swagger.v3.parser.OpenAPIV3Parser
+import io.swagger.v3.parser.core.models.ParseOptions
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.ConvertedWebApiToOasResult
-import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.parser.OpenAPIV3Parser
-import io.swagger.v3.parser.core.models.{ParseOptions, SwaggerParseResult}
+import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{ConvertedWebApiToOasResult, GeneralOpenApiProcessingError}
 
 import scala.io.Source
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.OpenApiProcessingError
-import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.GeneralOpenApiProcessingError
 
 class OpenApiEnhancementsSpec extends AnyWordSpec with Matchers with OpenApiEnhancements {
 
