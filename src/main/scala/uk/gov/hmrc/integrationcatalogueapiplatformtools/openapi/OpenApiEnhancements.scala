@@ -68,7 +68,7 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging {
 
   
 
-    def extractDocumentation(apiName: String, extensionData: util.ArrayList[java.util.LinkedHashMap[String, Object]]) = {
+    def extractDocumentation(apiName: String, extensionData: util.ArrayList[java.util.LinkedHashMap[String, Object]]): List[SubDocument] = {
       val convertedList = extensionData.asScala.toList
       convertedList.flatMap(x => {
         val maybeContent = Option(x.get("content"))
@@ -119,8 +119,12 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging {
 
   }
 
+  private def fixDocContent(content: String): String = {
+    content.replaceAll("(?<!\\n)(\\n){1}(\\*){1}( ){1}", "\n\n* ")
+  } 
+
   private def concatenateXamfDescriptions(openAPI: OpenAPI): OpenAPI ={
-     def extractExternalDocsContent(externalDocs: ExternalDocumentation)={
+     def extractExternalDocsContent(externalDocs: ExternalDocumentation): Option[String]={
         val description = Option(externalDocs.getDescription())
         val title = Option(externalDocs.getExtensions())
         .flatMap(x=> Option(x.get(X_AMF_TITLE_KEY)))
@@ -135,9 +139,11 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging {
       externalDocs <- Option(openAPI.getExternalDocs())
       externalDocsDesc =  extractExternalDocsContent(externalDocs)
       extensions =  getExtensions(openAPI)
-      xamfDocsContent = if (extensions.isDefined) extractDocumentation("N/A", extensions.get).map(doc =>"#  "+ doc.title + "\n" + doc.content).mkString("\n") else ""
+      xamfDocsContent = if (extensions.isDefined) extractDocumentation("N/A", extensions.get).map(doc =>"#  "+ doc.title + "\n" + fixDocContent(doc.content)).mkString("\n") else ""
     } yield externalDocsDesc.getOrElse("") + "\n" +  xamfDocsContent
      
+
+     // look for "* " and check 4 characters before is /n/n or /n if /n make /n/n
       Option(openAPI.getInfo())
       .map(info => {
         longDesc.map(x => if(x.nonEmpty){info.setDescription(x)})
