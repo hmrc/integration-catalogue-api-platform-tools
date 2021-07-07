@@ -1,7 +1,10 @@
 openapi: 3.0.0
 info:
   title: Address Verification
-  description: A description.
+  description: "#  Overview\nThis API enables your application to lookup the full\
+    \ address for a UK postcode.\nThe results can be narrowed down by providing an\
+    \ optional filter, e.g. \"21 High Street\".\n\nAddress data is provided by Ordnance\
+    \ Survey.\n"
   version: "1.0"
   x-integration-catalogue:
     short-description: A description.
