@@ -134,8 +134,8 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging {
     val longDesc = for{
       externalDocs <- Option(openAPI.getExternalDocs())
       externalDocsDesc =  extractExternalDocsContent(externalDocs)
-      extensions <-  getExtensions(openAPI)
-      xamfDocsContent = extractDocumentation("N/A", extensions).map(doc =>"#  "+ doc.title + "\n" + doc.content).mkString("\n")
+      extensions =  getExtensions(openAPI)
+      xamfDocsContent = if (extensions.isDefined) extractDocumentation("N/A", extensions.get).map(doc =>"#  "+ doc.title + "\n" + doc.content).mkString("\n") else ""
     } yield externalDocsDesc.getOrElse("") + "\n" +  xamfDocsContent
      
       Option(openAPI.getInfo())
