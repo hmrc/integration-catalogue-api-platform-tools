@@ -19,6 +19,7 @@ package uk.gov.hmrc.integrationcatalogueapiplatformtools.webapihandler
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.{AccessType, ConvertedWebApiToOasResult, CsvApiRecord, Private, Public}
 import webapi.{Oas30, Raml10, WebApiDocument}
 
+import java.util.concurrent.TimeUnit
 import scala.compat.java8._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -27,12 +28,15 @@ trait WebApiHandler {
 
   // $COVERAGE-OFF$
   def parseRamlFromFileName(fileName: String): Future[WebApiDocument] = {
-    FutureConverters.toScala(Raml10.parse(fileName)).map(x => x.asInstanceOf[WebApiDocument])
+    FutureConverters.toScala({
+     TimeUnit.MILLISECONDS.sleep(250)
+      Raml10.parse(fileName)}).map(x => x.asInstanceOf[WebApiDocument])
   }
-
   def parseOasFromWebApiModel(model: WebApiDocument, apiName: String, accessType: AccessType): Future[ConvertedWebApiToOasResult] = {
-    FutureConverters.toScala(Oas30.generateYamlString(model))
-      .map(oasAsString => ConvertedWebApiToOasResult(oasAsString, apiName, accessTypeDescription(accessType)))
+    FutureConverters.toScala({
+      TimeUnit.MILLISECONDS.sleep(250)
+      Oas30.generateYamlString(model)
+    }).map(oasAsString => ConvertedWebApiToOasResult(oasAsString, apiName, accessTypeDescription(accessType)))
   }
   // $COVERAGE-ON$
 

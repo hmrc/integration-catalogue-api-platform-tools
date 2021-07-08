@@ -43,4 +43,9 @@ case class ConvertedWebApiToOasResult(oasAsString: String, apiName: String, acce
 
 sealed trait FileExportResult
 case class SuccessfulFileExportResult(apiName: String)  extends FileExportResult
-case class FailedFileExportResult(apiName: String)  extends FileExportResult
+case class FailedFileExportResult(apiName: String, message: String)  extends FileExportResult
+
+
+sealed trait OpenApiProcessingError
+
+case class GeneralOpenApiProcessingError(apiName: String, message: String) extends OpenApiProcessingError

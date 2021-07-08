@@ -24,7 +24,6 @@ import webapi.WebApiDocument
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.control.NonFatal
 
 object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApiHandler {
 
@@ -54,9 +53,11 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
       .map(results => {
         results.map(convertedWebApiToOasResult => {
           addOasSpecAttributes(convertedWebApiToOasResult) match {
-            case Some(openApiAsString) =>f.apply(s"generated/${convertedWebApiToOasResult.apiName}.yaml", openApiAsString)
+            case Right(openApiAsString) =>f.apply(s"generated/${convertedWebApiToOasResult.apiName}.yaml", openApiAsString)
               SuccessfulFileExportResult(convertedWebApiToOasResult.apiName)
-            case None                  => FailedFileExportResult(convertedWebApiToOasResult.apiName)
+            case Left(error: GeneralOpenApiProcessingError)   =>
+             FailedFileExportResult(error.apiName, error.message)
+            case Left(_) =>  FailedFileExportResult(convertedWebApiToOasResult.apiName, "UnknownError") 
           }
         })
       })

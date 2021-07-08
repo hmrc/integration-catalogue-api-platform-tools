@@ -1,7 +1,19 @@
 openapi: 3.0.0
 info:
   title: Address Verification
-  description: This is a private API.
+  description: "#  Overview\nThis API enables your application to lookup the full\
+    \ address for a UK postcode.\nThe results can be narrowed down by providing an\
+    \ optional filter, e.g. \"21 High Street\".\n\nAddress data is provided by Ordnance\
+    \ Survey.\n#  Versioning\nWhen an API changes in a way that is backwards-incompatible,\
+    \ we increase the version number of the API. \nSee our [reference guide](https://developer.service.hmrc.gov.uk/api-documentation/docs/reference-guide#versioning)\
+    \ for more on\nversioning.\n\n#  Errors\nWe use standard HTTP status codes to\
+    \ show whether an API request succeeded or not. They are usually in the range:\n\
+    \n* 200 to 299 if it succeeded, including code 202 if it was accepted by an API\
+    \ that needs to wait for further action\n\n* 400 to 499 if it failed because of\
+    \ a client error by your application\n\n* 500 to 599 if it failed because of an\
+    \ error on our server\n\nErrors specific to each API are shown in the Endpoints\
+    \ section, under Response. \nSee our [reference guide](https://developer.service.hmrc.gov.uk/api-documentation/docs/reference-guide#errors)\
+    \ for more on errors.\n\n"
   version: "1.0"
   x-integration-catalogue:
     short-description: This is a private API.

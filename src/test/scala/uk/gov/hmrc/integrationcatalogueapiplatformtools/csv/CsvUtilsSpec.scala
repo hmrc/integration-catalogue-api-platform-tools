@@ -16,13 +16,11 @@
 
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.csv
 
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-
-import java.io.{ByteArrayInputStream, InputStream, InputStreamReader}
-import scala.io.Source
-
+import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model._
+
+import scala.io.Source
 
 class CsvUtilsSpec  extends AnyWordSpec with Matchers {
 
