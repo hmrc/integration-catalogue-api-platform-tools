@@ -24,146 +24,97 @@ import uk.gov.hmrc.integrationcatalogueapiplatformtools.Logging
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.ConvertedWebApiToOasResult
 
 import java.util
-import scala.collection.JavaConverters._
+
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.OpenApiProcessingError
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.GeneralOpenApiProcessingError
 import io.swagger.v3.oas.models.ExternalDocumentation
 
-trait OpenApiEnhancements extends ExtensionKeys with Logging {
+trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfText with OpenAPICommon {
 
   def addOasSpecAttributes(convertedOasResult: ConvertedWebApiToOasResult): Either[OpenApiProcessingError, String] = {
     val options: ParseOptions = new ParseOptions()
     options.setResolve(false)
-    val maybeOpenApi = Option(new OpenAPIV3Parser().readContents(convertedOasResult.oasAsString, null, options))
-      .flatMap(swaggerParseResult => Option(swaggerParseResult.getOpenAPI))
-
-    val validatedOpenApi = maybeOpenApi match {
+    val validatedOpenApi = Option(new OpenAPIV3Parser().readContents(convertedOasResult.oasAsString, new util.ArrayList(), options))
+      .flatMap(swaggerParseResult => Option(swaggerParseResult.getOpenAPI)) match {
       case Some(openApi) => validateAmfOAS(openApi, convertedOasResult.apiName)
-      case None          => Left(GeneralOpenApiProcessingError(convertedOasResult.apiName, "Swagger Parse failure"))
+      case None => Left(GeneralOpenApiProcessingError(convertedOasResult.apiName, "Swagger Parse failure"))
     }
 
     validatedOpenApi match {
-      case Right(openAPI)                  => {
+      case Right(openAPI) =>
         addAccessTypeToDescription(openAPI, convertedOasResult.accessTypeDescription)
           .flatMap(addExtensions(_, convertedOasResult.apiName))
-          .map(concatenateXamfDescriptions(_))
+          .map(concatenateXamfDescriptions)
           .map(x => Right(openApiToContent(x)))
           .getOrElse(Left(GeneralOpenApiProcessingError(convertedOasResult.apiName, "Swagger Parse failure")))
-      }
       case Left(e: OpenApiProcessingError) => Left(e)
     }
   }
 
-    def getExtensions(openApi: OpenAPI): Option[util.ArrayList[java.util.LinkedHashMap[String, Object]]] = {
-      Option(openApi.getExtensions()).flatMap(extensionsMap =>
-        Option(extensionsMap.get(X_AMF_USERDOCUMENTATION_KEY))
-          .map(x => {
-            x.asInstanceOf[util.ArrayList[java.util.LinkedHashMap[String, Object]]]
-          })
-      )
+  private def addAccessTypeToDescription(openApi: OpenAPI, accessTypeDescription: String): Option[OpenAPI] = Option(openApi.getInfo).map(info => {
+    Option(info.getDescription) match {
+      case None => info.setDescription(accessTypeDescription)
+      case Some(x) if (x.isEmpty || x == "null") => info.setDescription(accessTypeDescription)
+      case Some(_) => ()
     }
+    openApi.setInfo(info)
+    openApi
+  })
 
+  private def fixDocContent(content: String): String = fixDevhubUrls(addNewLineToBulletMarkDownIfNeeded(content))
 
-    case class SubDocument(apiName: String, title: String, content: String)
-
-  
-
-    def extractDocumentation(apiName: String, extensionData: util.ArrayList[java.util.LinkedHashMap[String, Object]]): List[SubDocument] = {
-      val convertedList = extensionData.asScala.toList
-      convertedList.flatMap(x => {
-        val maybeContent = Option(x.get("content"))
-        val mayBeTitle = Option(x.get("title"))
-        (mayBeTitle, maybeContent) match {
-          case (Some(title: String), Some(content: String)) => Some(SubDocument(apiName, title, content))
-          case _ => None
-        }
-      })
-    }
-
-  private def validateAmfOAS(openApi: OpenAPI, apiName: String): Either[OpenApiProcessingError, OpenAPI] = {
-
-
-    def validateSubdocuments(subdocuments: List[SubDocument], openApi: OpenAPI) = {
-      val errorListAsStrings: List[String] = subdocuments.filter(document => {
-        document.content.contains("https://developer.service.hmrc.gov.uk/api-documentation/assets/")
-      })
-      .map(document => s"API: ${document.apiName} content for title: ${document.title} points to a file!! ${document.content} \n")
-
-      if (errorListAsStrings.nonEmpty) {
-        Left(GeneralOpenApiProcessingError(apiName, errorListAsStrings.mkString))
-      } else Right(openApi)
-
-    }
-
-    val maybeUserDocumentationExtensions: Option[util.ArrayList[util.LinkedHashMap[String, AnyRef]]] =
-      Option(openApi).flatMap(getExtensions)
-
-    val listOfsubDocuments: List[SubDocument] =
-      maybeUserDocumentationExtensions.map(x => extractDocumentation(apiName, x)).getOrElse(List.empty)
-
-    validateSubdocuments(listOfsubDocuments, openApi)
-
+  def fixDevhubUrls(content: String) ={
+    content.replaceAll("\\(/api-documentation/docs/", "(https://developer.service.hmrc.gov.uk/api-documentation/docs/")
   }
 
-  private def addAccessTypeToDescription(openApi: OpenAPI, accessTypeDescription: String): Option[OpenAPI] = {
-
-    Option(openApi.getInfo).map(info => {
-      Option(info.getDescription) match {
-        case None                                  => info.setDescription(accessTypeDescription)
-        case Some(x) if (x.isEmpty || x == "null") => info.setDescription(accessTypeDescription)
-        case Some(_)                               => ()
-      }
-      openApi.setInfo(info)
-      openApi
-    })
-
-  }
-
-  private def fixDocContent(content: String): String = {
+  def addNewLineToBulletMarkDownIfNeeded(content: String) ={
     content.replaceAll("(?<!\\n)(\\n){1}(\\*){1}( ){1}", "\n\n* ")
-  } 
+  }
 
-  private def concatenateXamfDescriptions(openAPI: OpenAPI): OpenAPI ={
-     def extractExternalDocsContent(externalDocs: ExternalDocumentation): Option[String]={
-        val description = Option(externalDocs.getDescription())
-        val title = Option(externalDocs.getExtensions())
-        .flatMap(x=> Option(x.get(X_AMF_TITLE_KEY)))
-          
-        (title, description) match {
-              case (Some(title), Some(description)) => Some("#  " + title + "\n" + description)
-              case _ => None
-        }
-     }
- 
-    val longDesc = for{
-      externalDocs <- Option(openAPI.getExternalDocs())
-      externalDocsDesc =  extractExternalDocsContent(externalDocs)
-      extensions =  getExtensions(openAPI)
-      xamfDocsContent = if (extensions.isDefined) extractDocumentation("N/A", extensions.get).map(doc =>"#  "+ doc.title + "\n" + fixDocContent(doc.content)).mkString("\n") else ""
-    } yield externalDocsDesc.getOrElse("") + "\n" +  xamfDocsContent
-     
 
-     // look for "* " and check 4 characters before is /n/n or /n if /n make /n/n
-      Option(openAPI.getInfo())
+  private def concatenateXamfDescriptions(openAPI: OpenAPI): OpenAPI = {
+    def extractExternalDocsContent(externalDocs: ExternalDocumentation): Option[String] = {
+      val description = Option(externalDocs.getDescription)
+      val title = Option(externalDocs.getExtensions)
+        .flatMap(x => Option(x.get(X_AMF_TITLE_KEY)))
+
+      (title, description) match {
+        case (Some(title), Some(description)) => Some("#  " + title + "\n" + description)
+        case _ => None
+      }
+    }
+
+    val longDesc = for {
+      externalDocs <- Option(openAPI.getExternalDocs)
+      externalDocsDesc = extractExternalDocsContent(externalDocs)
+      extensions = getExtensions(openAPI)
+      xamfDocsContent = if (extensions.isDefined) {
+        extractDocumentation("N/A", extensions.get).map(doc => "#  " + doc.title + "\n" + fixDocContent(doc.content)).mkString("\n")
+      } else ""
+    } yield externalDocsDesc.getOrElse("") + "\n" + xamfDocsContent
+
+    // look for "* " and check 4 characters before is /n/n or /n if /n make /n/n
+    Option(openAPI.getInfo)
       .map(info => {
-        longDesc.map(x => if(x.nonEmpty){info.setDescription(x)})
+        longDesc.map(x => if (x.nonEmpty) {
+          info.setDescription(x)
+        })
       })
-      openAPI
-    // get external doc section and externalDocs ->  x-amf-title & description
-    // get x-amf-documentation extensions... need to maintain order and concatenate "title" and "content"
+    openAPI
+
   }
 
 
   private def addExtensions(openApi: OpenAPI, apiName: String): Option[OpenAPI] = {
     val subLevelExtensions = new util.HashMap[String, AnyRef]()
 
-    Option(openApi.getInfo())
+    Option(openApi.getInfo)
       .map(info => {
 
         subLevelExtensions.put(PLATFORM_EXTENSION_KEY, "API_PLATFORM")
         subLevelExtensions.put(PUBLISHER_REF_EXTENSION_KEY, apiName)
 
-        Option(info.getDescription()).map(description => {
+        Option(info.getDescription).map(description => {
           subLevelExtensions.put(SHORT_DESC_EXTENSION_KEY, truncateShortDescription(description))
         })
 
@@ -181,7 +132,7 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging {
   }
 
   private def truncateShortDescription(description: String): String = {
-    if (description.length > 180) description.substring(0, (180 - 3)) + "..."
+    if (description.length > 180) description.substring(0, 180 - 3) + "..."
     else description
   }
 

@@ -25,3 +25,6 @@ trait ExtensionKeys {
   val X_AMF_USERDOCUMENTATION_KEY = "x-amf-userDocumentation"
   val X_AMF_TITLE_KEY = "x-amf-title"
 }
+
+
+case class SubDocument(apiName: String, title: String, content: String)
