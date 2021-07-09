@@ -24,6 +24,7 @@ trait ExtensionKeys {
   val SHORT_DESC_EXTENSION_KEY = "short-description"
   val X_AMF_USERDOCUMENTATION_KEY = "x-amf-userDocumentation"
   val X_AMF_TITLE_KEY = "x-amf-title"
+  val X_AMF_USES = "x-amf-uses"
 }
 
 
