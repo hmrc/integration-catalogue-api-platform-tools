@@ -55,6 +55,20 @@ paths:
           description: Refine the search results futher based on house number or street
             name
           example: 36+Test+Street
+      - name: Content-Type
+        in: header
+        description: "Specifies the format of the request body, which must be JSON.\
+          \ For example: `application/json`"
+        required: true
+        schema:
+          type: string
+      - name: Accept
+        in: header
+        description: "Specifies the response format and the version of the API to\
+          \ be used. For example: `application/vnd.hmrc.1.0+json`"
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           content:

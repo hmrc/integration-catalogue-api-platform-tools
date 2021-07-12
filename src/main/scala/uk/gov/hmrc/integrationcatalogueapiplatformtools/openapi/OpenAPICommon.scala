@@ -21,20 +21,34 @@ import scala.collection.JavaConverters._
 import java.util
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.parameters.Parameter
+import io.swagger.v3.oas.models.media.Schema
+import io.swagger.v3.oas.annotations
 
 trait OpenAPICommon extends ExtensionKeys {
 
+
   private def addCommonHeaders(openAPI: OpenAPI)={
     def addHeadersToOperation(operation: Operation) ={
+
+      val stringSchema = new Schema()
+      stringSchema.setType("string")
+
       val contentTypeHeader = new Parameter()
       contentTypeHeader.setIn("header")
       contentTypeHeader.setName("Content-Type")
-      contentTypeHeader.setDescription("Specifies the format of the request body, which must be JSON.")
+      contentTypeHeader.setDescription("Specifies the format of the request body, which must be JSON. For example: `application/json`")
+      contentTypeHeader.setSchema(stringSchema)
       contentTypeHeader.setRequired(true)
 
-      val headers = new java.util.ArrayList[Parameter]()
-      headers.add(contentTypeHeader)
-      operation.setParameters(headers)
+      val acceptHeader = new Parameter()
+      acceptHeader.setIn("header")
+      acceptHeader.setName("Accept")
+      acceptHeader.setDescription("Specifies the response format and the version of the API to be used. For example: `application/vnd.hmrc.1.0+json`")
+      acceptHeader.setSchema(stringSchema)
+      acceptHeader.setRequired(true)
+
+      operation.addParametersItem(contentTypeHeader)
+      operation.addParametersItem(acceptHeader)
       operation
     }
     Option(openAPI.getPaths)
