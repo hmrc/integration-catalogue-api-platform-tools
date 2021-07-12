@@ -59,7 +59,7 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfTe
     // if it is add common headers to all paths.. 
     // https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
     getXamfUsesExtensions(openApi)
-    .map(extractUses(apiName, _))
+    .map(extractUses(apiName, _, openApi))
     openApi
   }
 

@@ -19,24 +19,52 @@ package uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi
 import io.swagger.v3.oas.models.OpenAPI
 import scala.collection.JavaConverters._
 import java.util
+import io.swagger.v3.oas.models.Operation
+import io.swagger.v3.oas.models.parameters.Parameter
 
 trait OpenAPICommon extends ExtensionKeys {
 
-  def extractUses(apiName: String, extensionData: util.ArrayList[java.util.LinkedHashMap[String, Object]]) = {
+  private def addCommonHeaders(openAPI: OpenAPI)={
+    def addHeadersToOperation(operation: Operation) ={
+      val contentTypeHeader = new Parameter()
+      contentTypeHeader.setIn("header")
+      contentTypeHeader.setName("Content-Type")
+      contentTypeHeader.setDescription("Specifies the format of the request body, which must be JSON.")
+      contentTypeHeader.setRequired(true)
+
+      val headers = new java.util.ArrayList[Parameter]()
+      headers.add(contentTypeHeader)
+      operation.setParameters(headers)
+      operation
+    }
+    Option(openAPI.getPaths)
+      .map(paths => paths.asScala.toMap.map(x => x._2)
+      .map(x => x.readOperations().asScala.foreach(addHeadersToOperation(_))))
+
+    openAPI
+  }
+
+
+  def extractUses(apiName: String, extensionData: util.ArrayList[java.util.LinkedHashMap[String, Object]], openAPI: OpenAPI) = {
     val convertedList = extensionData.asScala.toList
     convertedList.flatMap(x => {
       val maybeHeaders = Option(x.get("headers"))
       val maybeSec = Option(x.get("sec"))
       maybeHeaders.map(x => {
-        if (x == "https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml") { println(s"$apiName headers are common ones") }
-        else { println(s"$apiName non standard headers or missing from x-amf-uses") }
+        if (x.toString == "https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml") {
+          addCommonHeaders(openAPI)
+          println(s"$apiName headers are common ones")
+
+        } else { println(s"$apiName non standard headers or missing from x-amf-uses") }
       })
 
       maybeSec.map(x => {
-        if (x == "https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml") { println(s"$apiName security is common one") }
-        else { println(s"$apiName non standard security or missing from x-amf-uses") }
+        if (x.toString == "https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml") {
+          println(s"$apiName security is common one")
+        } else { println(s"$apiName non standard security or missing from x-amf-uses") }
       })
     })
+    openAPI
   }
 
   def addAcceptAndContentTypeHeaders(openApi: OpenAPI): OpenAPI = {
