@@ -52,6 +52,15 @@ class OpenApiEnhancementsSpec extends AnyWordSpec with Matchers with OpenApiEnha
         .flatMap(info => Option(info.getDescription()))
     }
 
+    def validateExpectedFileContents(inputFile: String, expectedFile: String) = {
+      val contentsToParse = getFileContents(inputFile)
+      val expectedYaml = getFileContents(expectedFile)
+      addOasSpecAttributes(ConvertedWebApiToOasResult(contentsToParse, "iamAnApi", "This is a private API.")) match {
+        case Left(_)          => fail()
+        case Right(oasString) => oasString shouldBe expectedYaml
+      }
+    }
+
   }
 
   "addOasSpecAttributes " should {
@@ -61,13 +70,7 @@ class OpenApiEnhancementsSpec extends AnyWordSpec with Matchers with OpenApiEnha
     }
 
     "add integration catalogue extensions to expected yaml file when short-description DOESN'T need to be truncated" in new Setup {
-      val contentsToParse = getFileContents("noIntCatExtensions.yaml")
-      val expectedYaml = getFileContents("expectedWithIntCatExtensions.yaml")
-      addOasSpecAttributes(ConvertedWebApiToOasResult(contentsToParse, "iamAnApi", "This is a private API.")) match {
-        case Left(_)          => fail()
-        case Right(oasString) => oasString shouldBe expectedYaml
-      }
-
+      validateExpectedFileContents("noIntCatExtensions.yaml", "expectedWithIntCatExtensions.yaml")
     }
 
     "Return Left(GeneralOpenApiProcessingError) if contents to parse has invalid x-amf-userDocumentation content" in new Setup {
@@ -82,13 +85,7 @@ class OpenApiEnhancementsSpec extends AnyWordSpec with Matchers with OpenApiEnha
 
     }
     "Return Right if contents to parse does not have x-amf-userDocumentation tag" in new Setup {
-      val contentsToParse = getFileContents("noIntCatExtensions-withNOxAmfDocumentation.yaml")
-      val expectedYaml = getFileContents("expectedWithIntCatExtensions-NOxAmfDocumentation.yaml")
-      addOasSpecAttributes(ConvertedWebApiToOasResult(contentsToParse, "iamAnApi", "This is a private API.")) match {
-        case Left(_)          => fail()
-        case Right(oasString) => oasString shouldBe expectedYaml
-      }
-
+      validateExpectedFileContents("noIntCatExtensions-withNOxAmfDocumentation.yaml", "expectedWithIntCatExtensions-NOxAmfDocumentation.yaml")
     }
 
     "add integration catalogue extensions to expected yaml file when short-description DOES need to be truncated" in new Setup {
@@ -138,7 +135,38 @@ class OpenApiEnhancementsSpec extends AnyWordSpec with Matchers with OpenApiEnha
           resultingShortDesc shouldBe expectedShortDesc
         }
       }
+    }
 
+    "Return Right if contents to parse contains path AND operation level Content-Type headers" in new Setup {
+      validateExpectedFileContents("with-path-and-op-level-ContentType-Header.yaml", "expected-with-path-and-op-level-ContentType-Header.yaml")
+    }
+
+    "Return Right if contents to parse ONLY contains path level Content-Type header" in new Setup {
+      validateExpectedFileContents("with-only-path-level-ContentType-Header.yaml", "expected-with-only-path-level-ContentType-Header.yaml")
+    }
+
+    "Return Right if contents to parse ONLY contains operation level Content-Type header" in new Setup {
+      validateExpectedFileContents("with-only-op-level-ContentType-Header.yaml", "expected-with-only-op-level-ContentType-Header.yaml")
+    }
+
+    "Return Right if contents to parse contains path AND operation level Accept headers" in new Setup {
+      validateExpectedFileContents("with-path-and-op-level-Accept-Header.yaml", "expected-with-path-and-op-level-Accept-Header.yaml")
+    }
+
+    "Return Right if contents to parse ONLY contains path level Accept header" in new Setup {
+      validateExpectedFileContents("with-only-path-level-Accept-Header.yaml", "expected-with-only-path-level-Accept-Header.yaml")
+    }
+
+    "Return Right if contents to parse ONLY contains operation level Accept header" in new Setup {
+      validateExpectedFileContents("with-only-op-level-Accept-Header.yaml", "expected-with-only-op-level-Accept-Header.yaml")
+    }
+
+    "Return Right if contents to parse does not contain any Accept or Content-Type headers" in new Setup {
+      validateExpectedFileContents("no-Accept-or-ContentType-Headers.yaml", "expected-no-ContentType-or-Accept-Headers.yaml")
+    }
+
+    "Return Right if contents to parse contains Security tag with OAuth" in new Setup {
+      validateExpectedFileContents("with-security-oauth-tag.yaml", "expected-with-op-level-Authorization-Header.yaml")
     }
   }
 }

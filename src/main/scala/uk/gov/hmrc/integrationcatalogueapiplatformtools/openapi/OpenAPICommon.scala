@@ -117,10 +117,10 @@ trait OpenAPICommon extends ExtensionKeys {
       Option(extensionsMap.get(key))
         .map(x => {
           x match {
-            case _ if (x.isInstanceOf[util.ArrayList[java.util.LinkedHashMap[String, Object]]]) => x.asInstanceOf[util.ArrayList[java.util.LinkedHashMap[String, Object]]]
-            case _ if (x.isInstanceOf[java.util.LinkedHashMap[String, Object]])                 => {
+            case y : util.ArrayList[java.util.LinkedHashMap[String, Object]] => y
+            case z : java.util.LinkedHashMap[String, Object]                  => {
               val list = new util.ArrayList[java.util.LinkedHashMap[String, Object]]()
-              list.add(x.asInstanceOf[java.util.LinkedHashMap[String, Object]])
+              list.add(z)
               list
             }
           }
@@ -131,10 +131,6 @@ trait OpenAPICommon extends ExtensionKeys {
 
   def getXamfDocumentationExtensions(openApi: OpenAPI): Option[util.ArrayList[java.util.LinkedHashMap[String, Object]]] = {
     getExtensions(openApi, X_AMF_USERDOCUMENTATION_KEY)
-  }
-
-  def getXamfUsesExtensions(openApi: OpenAPI): Option[util.ArrayList[java.util.LinkedHashMap[String, Object]]] = {
-    getExtensions(openApi, X_AMF_USES)
   }
 
 }
