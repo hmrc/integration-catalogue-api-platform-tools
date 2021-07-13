@@ -58,8 +58,7 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfTe
     // then check for headers -> if present check if value is link to docs frontend https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml 
     // if it is add common headers to all paths.. 
     // https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
-    getXamfUsesExtensions(openApi)
-    .map(extractUses(apiName, _, openApi))
+    addOperationLevelHeaders(openApi)
     openApi
   }
 
