@@ -17,47 +17,62 @@
 package uk.gov.hmrc.integrationcatalogueapiplatformtools.openapi
 
 import io.swagger.v3.oas.models.OpenAPI
+
 import scala.collection.JavaConverters._
 import java.util
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.parameters.Parameter
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.annotations
+import io.swagger.v3.oas.models.PathItem.HttpMethod
+
+import scala.collection.mutable
 
 trait OpenAPICommon extends ExtensionKeys {
 
 
+ private  def addHeader(name: String, description: String, operation: Operation): Unit ={
+    val stringSchema = new Schema()
+    stringSchema.setType("string")
+
+    val contentTypeHeader = new Parameter()
+    contentTypeHeader.setIn("header")
+    contentTypeHeader.setName(name)
+    contentTypeHeader.setDescription(description)
+    contentTypeHeader.setSchema(stringSchema)
+    contentTypeHeader.setRequired(true)
+    operation.addParametersItem(contentTypeHeader)
+  }
+
   private def addCommonHeaders(openAPI: OpenAPI)={
-    def addHeadersToOperation(operation: Operation) ={
 
-      val stringSchema = new Schema()
-      stringSchema.setType("string")
-
-      val contentTypeHeader = new Parameter()
-      contentTypeHeader.setIn("header")
-      contentTypeHeader.setName("Content-Type")
-      contentTypeHeader.setDescription("Specifies the format of the request body, which must be JSON. For example: `application/json`")
-      contentTypeHeader.setSchema(stringSchema)
-      contentTypeHeader.setRequired(true)
-
-      val acceptHeader = new Parameter()
-      acceptHeader.setIn("header")
-      acceptHeader.setName("Accept")
-      acceptHeader.setDescription("Specifies the response format and the version of the API to be used. For example: `application/vnd.hmrc.1.0+json`")
-      acceptHeader.setSchema(stringSchema)
-      acceptHeader.setRequired(true)
-
-      operation.addParametersItem(contentTypeHeader)
-      operation.addParametersItem(acceptHeader)
-      operation
+    def handleOperationsMap(operationsMap: util.Map[HttpMethod, Operation]) ={
+      operationsMap.asScala.foreach {
+        case (HttpMethod.POST, operation: Operation) => addAcceptHeader(operation)
+                                                        addContentTypeHeader(operation)
+        case (_ , operation: Operation)=> addAcceptHeader(operation)
+      }
+      openAPI
     }
+
+    def addContentTypeHeader(operation: Operation) ={
+      addHeader("Content-Type", "Specifies the format of the request body, which must be JSON. For example: `application/json`", operation)
+    }
+    def addAcceptHeader(operation: Operation) ={
+      addHeader("Accept", "Specifies the response format and the version of the API to be used. For example: `application/vnd.hmrc.1.0+json`", operation)
+    }
+
     Option(openAPI.getPaths)
-      .map(paths => paths.asScala.toMap.map(x => x._2)
-      .map(x => x.readOperations().asScala.foreach(addHeadersToOperation(_))))
+      .map(paths => paths.asScala.toMap.values.map(pathItem => handleOperationsMap(pathItem.readOperationsMap())))
 
     openAPI
   }
 
+  def addAuthorizationHeader(openAPI: OpenAPI): OpenAPI = {
+    Option(openAPI.getPaths)
+      .map(paths => paths.asScala.toMap.values.map(pathItem => pathItem.readOperations.forEach(addHeader("","", _))))
+    openAPI
+  }
 
   def extractUses(apiName: String, extensionData: util.ArrayList[java.util.LinkedHashMap[String, Object]], openAPI: OpenAPI) = {
     val convertedList = extensionData.asScala.toList
@@ -74,6 +89,7 @@ trait OpenAPICommon extends ExtensionKeys {
 
       maybeSec.map(x => {
         if (x.toString == "https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml") {
+         // addAuthorizationHeader(openAPI)
           println(s"$apiName security is common one")
         } else { println(s"$apiName non standard security or missing from x-amf-uses") }
       })
@@ -81,13 +97,7 @@ trait OpenAPICommon extends ExtensionKeys {
     openAPI
   }
 
-  def addAcceptAndContentTypeHeaders(openApi: OpenAPI): OpenAPI = {
-    openApi
-  }
 
-  def addAuthorizationHeader(openApi: OpenAPI): OpenAPI = {
-    openApi
-  }
 
   def extractDocumentation(apiName: String, extensionData: util.ArrayList[java.util.LinkedHashMap[String, Object]]): List[SubDocument] = {
     val convertedList = extensionData.asScala.toList
