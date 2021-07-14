@@ -24,27 +24,41 @@ import io.swagger.v3.oas.models.parameters.RequestBody
 import io.swagger.v3.oas.models.responses.ApiResponse
 import io.swagger.v3.oas.models.media.Content
 import io.swagger.v3.oas.models.examples.Example
+import io.swagger.v3.oas.models.media.MediaType
 
 trait OpenApiExamples extends ExtensionKeys {
 
+
   def handleContent(content: Content) = {
+
+    def handleLinkHashMap(a: java.util.LinkedHashMap[String, Object], mt: MediaType, exampleKey: String) ={
+                val description = a.asScala.get("description")
+                val value = a.asScala.get("value")
+                //  match {
+                //   case Some(x: String) => x
+                //   case Some(c: java.util.LinkedHashMap[String, String]) => c.asScala.values.mkString
+                //   case Some(d: java.util.LinkedHashMap[String, java.util.ArrayList[String]]) => d.asScala.values.toList.mkString
+                //   case Some(e) => e
+                //   case None => ""
+                // }
+                val example = new Example()
+                description.map(_.toString).map(example.setDescription)
+                value.fold(example.setValue(a))(x=> example.setValue(x))
+                mt.addExamples(exampleKey, example)
+    }
 
 /// map the schema values somewhere then copy back to mediatype
     content.values().asScala.map(mt => {
-      val examples = Option(mt.getSchema).flatMap(x => Option(x.getExtensions()).map(_.get(X_AMF_EXAMPLES)))
+      val examples = Option(mt.getSchema).flatMap(x => Option(x.getExtensions()).flatMap(extensions => Option(extensions.get(X_AMF_EXAMPLES))))
       examples match {
         case Some(y: java.util.List[String])                  => println(y.asScala.mkString)
+        case Some(y: java.util.ArrayList[java.util.LinkedHashMap[String, Object]]) => y.forEach(handleLinkHashMap(_, mt, "-"))
         case Some(z: java.util.LinkedHashMap[String, Object]) => z.asScala.foreach(x => {
             println(s"${x._1}")
 
             x._2 match {
-              case a: java.util.LinkedHashMap[String, String] =>
-                val description = a.asScala.get("description").getOrElse("")
-                val value = a.asScala.get("value").map(_.toString).getOrElse("")
-                val example = new Example()
-                example.setDescription(description)
-                example.setValue(value)
-                mt.addExamples(x._1, example)
+              case a: java.util.LinkedHashMap[String, Object] => handleLinkHashMap(a, mt, x._1)
+              
               case _                                          => ()
             }
 
@@ -77,6 +91,7 @@ trait OpenApiExamples extends ExtensionKeys {
 
   def addExamples(openAPI: OpenAPI) = {
     openAPI
+    println(s"getting examples for ${openAPI.getInfo().getTitle()}")
     Option(openAPI.getPaths())
       .map(paths =>
         paths.values
