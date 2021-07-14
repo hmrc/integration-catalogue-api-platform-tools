@@ -30,6 +30,7 @@ trait ExtensionKeys {
   val SEC_APPLICATION: String = "sec.x-application"
   val ACCEPT_HEADER: String = "headers.acceptHeader"
   val CONTENTTYPE_HEADER: String = "headers.contentHeader"
+  val X_AMF_EXAMPLES: String = "x-amf-examples"
 }
 
 

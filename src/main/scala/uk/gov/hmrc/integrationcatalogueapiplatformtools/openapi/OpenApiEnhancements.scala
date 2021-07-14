@@ -29,7 +29,7 @@ import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.OpenApiProcessingE
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.GeneralOpenApiProcessingError
 import io.swagger.v3.oas.models.ExternalDocumentation
 
-trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfText with OpenAPICommon {
+trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfText with OpenAPICommon with OpenApiExamples {
 
   def addOasSpecAttributes(convertedOasResult: ConvertedWebApiToOasResult): Either[OpenApiProcessingError, String] = {
     val options: ParseOptions = new ParseOptions()
@@ -46,6 +46,7 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfTe
           .flatMap(addExtensions(_, convertedOasResult.apiName))
           .map(concatenateXamfDescriptions)
           .map(addCommonHeaders(convertedOasResult.apiName, _))
+          .map(addExamples)
           .map((x => Right(openApiToContent(x))))
           .getOrElse(Left(GeneralOpenApiProcessingError(convertedOasResult.apiName, "Swagger Parse failure")))
       }
