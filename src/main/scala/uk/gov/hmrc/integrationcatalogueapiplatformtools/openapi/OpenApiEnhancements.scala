@@ -54,10 +54,6 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfTe
   }
 
   def addCommonHeaders(apiName: String, openApi: OpenAPI): OpenAPI ={
-    // check for x-amf-uses
-    // then check for headers -> if present check if value is link to docs frontend https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml 
-    // if it is add common headers to all paths.. 
-    // https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
     addOperationLevelHeaders(openApi)
     openApi
   }
