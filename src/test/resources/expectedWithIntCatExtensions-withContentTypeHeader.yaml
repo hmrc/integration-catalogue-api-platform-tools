@@ -52,6 +52,13 @@ paths:
         required: true
         schema:
           type: string
+      - name: Content-Type
+        in: header
+        description: "Specifies the format of the request body, which must be JSON.\
+          \ For example: `application/json`"
+        required: true
+        schema:
+          type: string
       - name: Accept
         in: header
         description: "Specifies the response format and the version of the API to\

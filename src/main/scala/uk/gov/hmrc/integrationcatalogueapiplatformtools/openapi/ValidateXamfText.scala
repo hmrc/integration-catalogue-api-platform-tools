@@ -40,7 +40,7 @@ trait ValidateXamfText extends OpenAPICommon {
     }
 
     val maybeUserDocumentationExtensions: Option[util.ArrayList[util.LinkedHashMap[String, AnyRef]]] =
-      Option(openApi).flatMap(getExtensions)
+      Option(openApi).flatMap(getXamfDocumentationExtensions)
 
     val listOfsubDocuments: List[SubDocument] =
       maybeUserDocumentationExtensions.map(x => extractDocumentation(apiName, x)).getOrElse(List.empty)

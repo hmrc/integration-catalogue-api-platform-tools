@@ -41,14 +41,21 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfTe
     }
 
     validatedOpenApi match {
-      case Right(openAPI) =>
+      case Right(openAPI) => {
         addAccessTypeToDescription(openAPI, convertedOasResult.accessTypeDescription)
           .flatMap(addExtensions(_, convertedOasResult.apiName))
           .map(concatenateXamfDescriptions)
-          .map(x => Right(openApiToContent(x)))
+          .map(addCommonHeaders(convertedOasResult.apiName, _))
+          .map((x => Right(openApiToContent(x))))
           .getOrElse(Left(GeneralOpenApiProcessingError(convertedOasResult.apiName, "Swagger Parse failure")))
+      }
       case Left(e: OpenApiProcessingError) => Left(e)
     }
+  }
+
+  def addCommonHeaders(apiName: String, openApi: OpenAPI): OpenAPI ={
+    addOperationLevelHeaders(openApi)
+    openApi
   }
 
   private def addAccessTypeToDescription(openApi: OpenAPI, accessTypeDescription: String): Option[OpenAPI] = Option(openApi.getInfo).map(info => {
@@ -87,7 +94,7 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfTe
     val longDesc = for {
       externalDocs <- Option(openAPI.getExternalDocs)
       externalDocsDesc = extractExternalDocsContent(externalDocs)
-      extensions = getExtensions(openAPI)
+      extensions = getXamfDocumentationExtensions(openAPI)
       xamfDocsContent = if (extensions.isDefined) {
         extractDocumentation("N/A", extensions.get).map(doc => "#  " + doc.title + "\n" + fixDocContent(doc.content)).mkString("\n")
       } else ""

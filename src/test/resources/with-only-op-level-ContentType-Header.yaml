@@ -1,20 +1,8 @@
 openapi: 3.0.0
 info:
   title: Address Verification
-  description: "#  Overview\nThis API enables your application to lookup the full\
-    \ address for a UK postcode.\nThe results can be narrowed down by providing an\
-    \ optional filter, e.g. \"21 High Street\".\n\nAddress data is provided by Ordnance\
-    \ Survey.\n"
+  description: A description.
   version: "1.0"
-  x-integration-catalogue:
-    short-description: A description.
-    platform: API_PLATFORM
-    publisher-reference: iamAnApi
-externalDocs:
-  description: "This API enables your application to lookup the full address for a\
-    \ UK postcode.\nThe results can be narrowed down by providing an optional filter,\
-    \ e.g. \"21 High Street\".\n\nAddress data is provided by Ordnance Survey."
-  x-amf-title: Overview
 servers:
 - url: https://api.service.hmrc.gov.uk/
 paths:
@@ -46,19 +34,6 @@ paths:
           description: Refine the search results futher based on house number or street
             name
           example: 36+Test+Street
-      - name: Authorization
-        in: header
-        description: "An OAuth 2.0 Bearer Token. For example: Bearer `bb7fed3fe10dd235a2ccda3d50fb`"
-        required: true
-        schema:
-          type: string
-      - name: Accept
-        in: header
-        description: "Specifies the response format and the version of the API to\
-          \ be used. For example: `application/vnd.hmrc.1.0+json`"
-        required: true
-        schema:
-          type: string
       responses:
         "200":
           content:
@@ -198,10 +173,8 @@ paths:
                       type: string
                       description: Local council or authority
                   additionalProperties: false
-      security:
-      - sec.x-application: []
       x-amf-is:
-      - headers.acceptHeader
+      - headers.contentHeader
 x-amf-uses:
   sec: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
   headers: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml
