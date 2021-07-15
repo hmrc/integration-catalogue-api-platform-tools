@@ -168,5 +168,13 @@ class OpenApiEnhancementsSpec extends AnyWordSpec with Matchers with OpenApiEnha
     "Return Right if contents to parse contains Security tag with OAuth" in new Setup {
       validateExpectedFileContents("with-security-oauth-tag.yaml", "expected-with-op-level-Authorization-Header.yaml")
     }
+
+    "Return Right with examples when input file contains x-amf-examples in the Request and Response" in new Setup {
+      validateExpectedFileContents("with-x-amf-examples-in-request-and-response.yaml", "expected-with-examples-in-request-and-response.yaml")
+    }      
+    
+    "Return Right with examples when input file contains x-amf-examples containing description and value" in new Setup {
+    validateExpectedFileContents("with-x-amf-examples-containing-description-and-value.yaml", "expected-with-examples-containing-description-and-value.yaml")
+    }
   }
 }
