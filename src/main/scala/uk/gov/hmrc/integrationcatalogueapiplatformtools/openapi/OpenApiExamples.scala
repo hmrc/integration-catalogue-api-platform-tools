@@ -32,48 +32,24 @@ trait OpenApiExamples extends ExtensionKeys {
   def handleContent(content: Content) = {
 
     def handleLinkHashMap(a: java.util.LinkedHashMap[String, Object], mt: MediaType, exampleKey: String) ={
-                val description = a.asScala.get("description")
-                val value = a.asScala.get("value")
-                //  match {
-                //   case Some(x: String) => x
-                //   case Some(c: java.util.LinkedHashMap[String, String]) => c.asScala.values.mkString
-                //   case Some(d: java.util.LinkedHashMap[String, java.util.ArrayList[String]]) => d.asScala.values.toList.mkString
-                //   case Some(e) => e
-                //   case None => ""
-                // }
                 val example = new Example()
-                description.map(_.toString).map(example.setDescription)
-                value.fold(example.setValue(a))(x=> example.setValue(x))
+                a.asScala.get("description").map(_.toString).map(example.setDescription)
+                a.asScala.get("value").fold(example.setValue(a))(x=> example.setValue(x))
                 mt.addExamples(exampleKey, example)
     }
 
-/// map the schema values somewhere then copy back to mediatype
     content.values().asScala.map(mt => {
       val examples = Option(mt.getSchema).flatMap(x => Option(x.getExtensions()).flatMap(extensions => Option(extensions.get(X_AMF_EXAMPLES))))
       examples match {
-        case Some(y: java.util.List[String])                  => println(y.asScala.mkString)
-        case Some(y: java.util.ArrayList[java.util.LinkedHashMap[String, Object]]) => y.forEach(handleLinkHashMap(_, mt, "-"))
         case Some(z: java.util.LinkedHashMap[String, Object]) => z.asScala.foreach(x => {
-            println(s"${x._1}")
-
             x._2 match {
               case a: java.util.LinkedHashMap[String, Object] => handleLinkHashMap(a, mt, x._1)
-              
               case _                                          => ()
             }
-
-            println(x._2.getClass.getName)
-            println(x._2.toString)
-
           })
-        case Some(y)                                          => println(s"***** NOT SURE WHAT EXAMPLE IS!!! ${y.getClass().getName()}")
-        case None                                             => println(s"***** NOT SURE WHAT EXAMPLE IS!!! None")
+        case Some(_)                                          => println(s"EXAMPLE IS Unknown Type")  
+        case None                                             => println(s"EXAMPLE IS None")
       }
-      // examples.foreach(example => {
-      //     println(example.toString)
-      //    //mt.setExample("blah")
-      //     })
-
     })
     ()
   }
@@ -90,7 +66,6 @@ trait OpenApiExamples extends ExtensionKeys {
   }
 
   def addExamples(openAPI: OpenAPI) = {
-    openAPI
     println(s"getting examples for ${openAPI.getInfo().getTitle()}")
     Option(openAPI.getPaths())
       .map(paths =>
@@ -98,9 +73,5 @@ trait OpenApiExamples extends ExtensionKeys {
           .forEach(pathItem => pathItem.readOperations().asScala.map(handleOperation))
       )
     openAPI
-    // paths -> pathitem -> Operation -> RequestBody/ApiResonpse -> Content (linked hashmap of "application/json" -> MediaType Object)
-    // inside mediatype Schema -> extension "x-amf-examples"
-    // copy the examples to MediaType > examples
-
   }
 }
