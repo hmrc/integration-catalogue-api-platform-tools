@@ -22,6 +22,7 @@ trait ExtensionKeys {
   val PUBLISHER_REF_EXTENSION_KEY: String = "publisher-reference"
   val PLATFORM_EXTENSION_KEY: String = "platform"
   val SHORT_DESC_EXTENSION_KEY: String = "short-description"
+  val REVIEWED_DATE_EXTENSION_KEY: String = "reviewed-date"
   val X_AMF_USERDOCUMENTATION_KEY: String = "x-amf-userDocumentation"
   val X_AMF_TITLE_KEY: String = "x-amf-title"
   val X_AMF_USES: String = "x-amf-uses"

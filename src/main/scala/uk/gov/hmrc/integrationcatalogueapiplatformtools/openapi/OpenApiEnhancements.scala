@@ -121,6 +121,7 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfTe
 
         subLevelExtensions.put(PLATFORM_EXTENSION_KEY, "API_PLATFORM")
         subLevelExtensions.put(PUBLISHER_REF_EXTENSION_KEY, apiName)
+        subLevelExtensions.put(REVIEWED_DATE_EXTENSION_KEY, "2021-04-01T00:00:00.000Z")
 
         Option(info.getDescription).map(description => {
           subLevelExtensions.put(SHORT_DESC_EXTENSION_KEY, truncateShortDescription(description))
