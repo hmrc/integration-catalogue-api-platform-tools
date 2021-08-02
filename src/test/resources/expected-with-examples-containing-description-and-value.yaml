@@ -4,6 +4,7 @@ info:
   description: A description.
   version: "1.0"
   x-integration-catalogue:
+    reviewed-date: 2021-04-01T00:00:00.000Z
     short-description: A description.
     platform: API_PLATFORM
     publisher-reference: iamAnApi

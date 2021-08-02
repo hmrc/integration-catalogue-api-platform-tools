@@ -16,6 +16,7 @@ info:
     \ for more on errors.\n\n"
   version: "1.0"
   x-integration-catalogue:
+    reviewed-date: 2021-04-01T00:00:00.000Z
     short-description: This is a private API.
     platform: API_PLATFORM
     publisher-reference: iamAnApi
