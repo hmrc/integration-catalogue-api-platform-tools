@@ -17,6 +17,8 @@ libraryDependencies += "org.raml" % "webapi-parser" % "0.5.0"
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.2"
 libraryDependencies += "org.apache.commons" % "commons-csv" % "1.8"
 libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.3"
+libraryDependencies += "org.typelevel" %% "cats-core" % "2.4.2"
+
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.2" % Test
 libraryDependencies += "com.vladsch.flexmark" %  "flexmark-all" % "0.36.8" % Test
