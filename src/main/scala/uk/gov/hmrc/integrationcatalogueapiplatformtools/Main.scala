@@ -48,14 +48,16 @@ object Main extends App with FileWriterUtils with Logging {
       val csvRecords = CsvUtils.csvApisToProcess("api-definition-csv-export.csv")
       val linesForBashScript = GenerateGitCloneBashScript.printScript(csvRecords)
       println(linesForBashScript)
-    case "--generateOas" :: Nil => {
-      val result = RepoFileExport.generateOasFiles("api-definition-csv-export.csv", None, writeToFile)
+
+    case "--generateOas" :: "--reviewedDate" :: date ::  Nil => {
+      val result = RepoFileExport.generateOasFiles("api-definition-csv-export.csv", None, writeToFile, date)
       result.onComplete {
         case Success(value) => printResults(value)
         case Failure(e) => logger.error("failed!!", e)
       }
       Await.result(result, 30 seconds)
-    }
+    }  
+   
     case unknown => println(s"Unrecognised arguments: $unknown")
   }
 }

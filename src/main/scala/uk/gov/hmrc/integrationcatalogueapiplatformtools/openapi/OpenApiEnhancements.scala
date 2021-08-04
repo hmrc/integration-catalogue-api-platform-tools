@@ -28,10 +28,11 @@ import java.util
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.OpenApiProcessingError
 import uk.gov.hmrc.integrationcatalogueapiplatformtools.model.GeneralOpenApiProcessingError
 import io.swagger.v3.oas.models.ExternalDocumentation
+import org.joda.time.DateTime
 
 trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfText with OpenAPICommon with OpenApiExamples {
 
-  def addOasSpecAttributes(convertedOasResult: ConvertedWebApiToOasResult): Either[OpenApiProcessingError, String] = {
+  def addOasSpecAttributes(convertedOasResult: ConvertedWebApiToOasResult, reviewedDate: String): Either[OpenApiProcessingError, String] = {
     val options: ParseOptions = new ParseOptions()
     options.setResolve(false)
     val validatedOpenApi = Option(new OpenAPIV3Parser().readContents(convertedOasResult.oasAsString, new util.ArrayList(), options))
@@ -43,7 +44,7 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfTe
     validatedOpenApi match {
       case Right(openAPI) => {
         addAccessTypeToDescription(openAPI, convertedOasResult.accessTypeDescription)
-          .flatMap(addExtensions(_, convertedOasResult.apiName))
+          .flatMap(addExtensions(_, convertedOasResult.apiName, reviewedDate))
           .map(concatenateXamfDescriptions)
           .map(addCommonHeaders(convertedOasResult.apiName, _))
           .map(addExamples)
@@ -113,7 +114,7 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfTe
   }
 
 
-  private def addExtensions(openApi: OpenAPI, apiName: String): Option[OpenAPI] = {
+  private def addExtensions(openApi: OpenAPI, apiName: String, reviewedDate: String): Option[OpenAPI] = {
     val subLevelExtensions = new util.HashMap[String, AnyRef]()
 
     Option(openApi.getInfo)
@@ -121,7 +122,7 @@ trait OpenApiEnhancements extends ExtensionKeys with Logging with ValidateXamfTe
 
         subLevelExtensions.put(PLATFORM_EXTENSION_KEY, "API_PLATFORM")
         subLevelExtensions.put(PUBLISHER_REF_EXTENSION_KEY, apiName)
-        subLevelExtensions.put(REVIEWED_DATE_EXTENSION_KEY, "2021-04-01T00:00:00.000Z")
+        subLevelExtensions.put(REVIEWED_DATE_EXTENSION_KEY, reviewedDate)
 
         Option(info.getDescription).map(description => {
           subLevelExtensions.put(SHORT_DESC_EXTENSION_KEY, truncateShortDescription(description))

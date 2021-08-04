@@ -48,7 +48,7 @@ This uses this library for parsing RAML and converting to OAS 3: [webapi-parser]
     ```
     
 1. Run the 'clone-apis.sh' from the 'api-repos' directory (this will take a few minutes to run!)
-1. Generate the OAS files with this script `export_oas.sh`.
+1. Generate the OAS files with this script `export_oas.sh` <valid ISO 8601 date time> i.e. `export_oas.sh 2020-12-25T12:00:00Z`
 1. Check for any errors in the OAS generate (mostly where it can't find the `application.raml` file).
 1. Copy and replace the OAS files in `integration-catalogue-oas-files` and import into the catalogue (checking for any publishing errors)
 # Notes on imports

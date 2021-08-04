@@ -24,6 +24,15 @@ import webapi.WebApiDocument
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Try
+import org.joda.time.DateTime
+import org.joda.time.format.ISODateTimeFormat
+import scala.util.Success
+import scala.util.Failure
+
+import cats.data.Validated._
+import cats.data._
+import cats.implicits._
 
 object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApiHandler {
 
@@ -34,8 +43,22 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
 
   }
 
-  def generateOasFiles(csvFilePath: String,  overridedRamlPath: Option[String], f : (String, String) => Unit): Future[Seq[FileExportResult]] = {
-    val eventualOasResults: Future[Seq[ConvertedWebApiToOasResult]] = Future.sequence(CsvUtils.csvApisToProcess(csvFilePath)
+  private def validateReviewedDate(reviewedDate: String) : ValidatedNel[String, String]= {
+    Try[DateTime]{
+          DateTime.parse(reviewedDate, ISODateTimeFormat.dateOptionalTimeParser())
+        } match {
+         case Success(dateTime) => Validated.valid(reviewedDate)
+         case Failure(e) =>  println(e.getMessage())
+        "Reviewed date is not a valid ISO 8601 date".invalidNel[String]
+        }
+
+  }
+
+  def generateOasFiles(csvFilePath: String,  overridedRamlPath: Option[String], f : (String, String) => Unit, reviewedDate: String): Future[Seq[FileExportResult]] = {
+    validateReviewedDate(reviewedDate) match {
+      case Invalid(e) => Future.successful(Seq(FailedFileExportResult("", e.head)))
+      case Valid(date) =>   {
+         val eventualOasResults: Future[Seq[ConvertedWebApiToOasResult]] = Future.sequence(CsvUtils.csvApisToProcess(csvFilePath)
       .map(record => {
         for {
           model <- csvRecordToRamlWebApiModelWithDescription(record, overridedRamlPath)
@@ -43,16 +66,19 @@ object RepoFileExport extends ExtensionKeys with OpenApiEnhancements with WebApi
         } yield convertedOasResult
       }))
 
-      processOasStrings(eventualOasResults, f)
+      processOasStrings(eventualOasResults, date, f)
+      }
+    }
+   
    
 
   }
 
-  def processOasStrings(eventualOasResults: Future[Seq[ConvertedWebApiToOasResult]], f : (String, String) => Unit): Future[Seq[FileExportResult]] = {
+  def processOasStrings(eventualOasResults: Future[Seq[ConvertedWebApiToOasResult]], reviewedDate: String, f : (String, String) => Unit): Future[Seq[FileExportResult]] = {
      eventualOasResults
       .map(results => {
         results.map(convertedWebApiToOasResult => {
-          addOasSpecAttributes(convertedWebApiToOasResult) match {
+          addOasSpecAttributes(convertedWebApiToOasResult, reviewedDate) match {
             case Right(openApiAsString) =>f.apply(s"generated/${convertedWebApiToOasResult.apiName}.yaml", openApiAsString)
               SuccessfulFileExportResult(convertedWebApiToOasResult.apiName)
             case Left(error: GeneralOpenApiProcessingError)   =>

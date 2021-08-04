@@ -60,7 +60,6 @@ marriage-allowance-des-stub;Marriage Allowance Test Support;1.0;PUBLIC
 mobile-audit;Mobile Audit;1.0;PRIVATE
 mobile-help-to-save;Mobile Help To Save;1.0;PRIVATE
 mobile-messages;Mobile Messages;1.0;PRIVATE
-mobile-office-of-transit;Mobile Office of Transit;1.0;PRIVATE
 mobile-paye;Mobile PAYE;1.0;PRIVATE
 mobile-push-notifications-registration;Mobile Push Notifications Registration;1.0;PRIVATE
 mobile-rds-vehicle-private;Mobile RDS Vehicle Private;1.0;PRIVATE
@@ -97,7 +96,6 @@ submission-tracker;Submission Tracker;1.0;PRIVATE
 tax-free-childcare-parent;Tax-Free Childcare Applicant;1.0;PRIVATE
 telephony-identity-verification-api;Telephony Identity Verification;1.0;PRIVATE
 telephony-identity-verification-test-api;Telephony Identity Verification Test;1.0;PRIVATE
-transit-movement-api;Transit Movement;1.0;PRIVATE
 txm-fph-validator-api;Test Fraud Prevention Headers;1.0;PUBLIC
 userid-recovery-api;User ID Recovery;1.0;PRIVATE;public/api/documentation
 vat-registered-companies-api;Check a UK VAT number;1.0;PUBLIC;public/api/conf

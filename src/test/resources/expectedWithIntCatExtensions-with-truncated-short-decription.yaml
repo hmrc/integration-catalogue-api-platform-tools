@@ -6,7 +6,7 @@ info:
     \ so that the yaml file has the truncated version of this description."
   version: "1.0"
   x-integration-catalogue:
-    reviewed-date: 2021-04-01T00:00:00.000Z
+    reviewed-date: 2021-12-25T12:00:00Z
     short-description: "This is a description longer than the maximum allowed which\
       \ is one hundred and eighty characters. This should be truncated by the api-platform-tools\
       \ so that the yaml file has th..."
